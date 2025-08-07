@@ -4,7 +4,11 @@ import os
 import unicodedata
 import numpy as np
 import locale
-locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')  # Türkçe sıralama
+#locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')  # Türkçe sıralama
+try:
+    locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_COLLATE, '')  # Sistem varsayılanına geç
 
 app = Flask(__name__)
 
@@ -130,3 +134,4 @@ if __name__ == '__main__':
     
 
     
+
