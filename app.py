@@ -179,6 +179,7 @@ def get_universiteler():
     
     # Filtreleme parametreleri
     search = request.args.get('search', '').lower()
+    ulke = request.args.get('ulke', '')
     sehir = request.args.get('sehir', '')
     grup = request.args.get('grup', '')
     sort_by = request.args.get('sort_by', 'Üniversite Adı')
@@ -201,6 +202,10 @@ def get_universiteler():
     if search:
         search_norm = normalize(search)
         df = df[df['Üniversite Adı'].apply(normalize).str.contains(search_norm)]
+    
+    # Ülke filtresi
+    if ulke:
+        df = df[df['Ülke'] == ulke]
     
     # Şehir filtresi
     if sehir:
@@ -226,10 +231,12 @@ def get_universiteler():
 def get_filtreler():
     df = load_data()
     
+    ulkeler = sorted(df['Ülke'].unique().tolist())
     sehirler = sorted(df['Şehir'].unique().tolist())
     gruplar = sorted(df['Grup'].unique().tolist())
     
     return jsonify({
+        'ulkeler': ulkeler,
         'sehirler': sehirler,
         'gruplar': gruplar
     })

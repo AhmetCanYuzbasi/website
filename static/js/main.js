@@ -2,6 +2,7 @@
 let currentSortBy = 'Üniversite Adı';
 let currentSortOrder = 'asc';
 let currentSearch = '';
+let currentUlke = '';
 let currentSehir = '';
 let currentGrup = '';
 let autocompleteList;
@@ -9,6 +10,7 @@ let autocompleteList;
 // DOM elements
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
+const ulkeFilter = document.getElementById('ulkeFilter');
 const sehirFilter = document.getElementById('sehirFilter');
 const grupFilter = document.getElementById('grupFilter');
 const clearFiltersBtn = document.getElementById('clearFilters');
@@ -32,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Filter functionality
+    ulkeFilter.addEventListener('change', performSearch);
     sehirFilter.addEventListener('change', performSearch);
     grupFilter.addEventListener('change', performSearch);
     clearFiltersBtn.addEventListener('click', clearFilters);
@@ -158,6 +161,14 @@ async function loadFilters() {
         const response = await fetch('/api/filtreler');
         const data = await response.json();
         
+        // Populate country filter
+        data.ulkeler.forEach(ulke => {
+            const option = document.createElement('option');
+            option.value = ulke;
+            option.textContent = ulke;
+            ulkeFilter.appendChild(option);
+        });
+        
         // Populate city filter
         data.sehirler.forEach(sehir => {
             const option = document.createElement('option');
@@ -185,6 +196,7 @@ async function loadUniversities() {
     try {
         const params = new URLSearchParams({
             search: currentSearch,
+            ulke: currentUlke,
             sehir: currentSehir,
             grup: currentGrup,
             sort_by: currentSortBy,
@@ -222,21 +234,31 @@ function displayUniversities(universities) {
             </div>
             <div class="university-info">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <i class="fas fa-globe me-1"></i>
+                        <strong>Ülke:</strong> ${uni['Ülke'] || 'Türkiye'}
+                    </div>
+                    <div class="col-md-3">
                         <i class="fas fa-map-marker-alt me-1"></i>
                         <strong>Şehir:</strong> ${uni['Şehir']}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <i class="fas fa-graduation-cap me-1"></i>
                         <strong>Fakülte:</strong> ${uni['Fakülte Adı']}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <i class="fas fa-users me-1"></i>
                         <strong>Kontenjan:</strong> ${uni['Kontenjan']}
                     </div>
-                    <div class="col-md-4">
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
                         <i class="fas fa-book me-1"></i>
                         <strong>Program:</strong> ${uni['Program Adı']}
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fas fa-chart-line me-1"></i>
+                        <strong>2024 Puanı:</strong> ${uni['2024 YKS En Küçük Puanı']}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -277,6 +299,10 @@ async function showUniversityDetail(programKodu) {
                         <div class="detail-item">
                             <span class="detail-label">Fakülte Adı:</span>
                             <span class="detail-value">${university['Fakülte Adı']}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ülke:</span>
+                            <span class="detail-value">${university['Ülke'] || 'Türkiye'}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Şehir:</span>
@@ -321,6 +347,7 @@ async function showUniversityDetail(programKodu) {
 // Perform search with current filters
 function performSearch() {
     currentSearch = searchInput.value.trim();
+    currentUlke = ulkeFilter.value;
     currentSehir = sehirFilter.value;
     currentGrup = grupFilter.value;
     
@@ -330,10 +357,12 @@ function performSearch() {
 // Clear all filters
 function clearFilters() {
     searchInput.value = '';
+    ulkeFilter.value = '';
     sehirFilter.value = '';
     grupFilter.value = '';
     
     currentSearch = '';
+    currentUlke = '';
     currentSehir = '';
     currentGrup = '';
     
