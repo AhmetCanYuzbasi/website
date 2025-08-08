@@ -94,7 +94,7 @@ def load_data_from_sheets():
         print('Google Sheets başlıkları:', list(df.columns))
         
         # Sütun yapısını kontrol et ve gerekirse düzenle
-        expected_columns = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı','Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
+        expected_columns = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı']
         
         # Eksik sütunları kontrol et
         missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -253,6 +253,14 @@ def get_universite_detay(program_kodu):
     universite = universite.where(pd.notnull(universite), None)
     return jsonify(universite.iloc[0].to_dict())
 
+@app.route('/detay/<program_kodu>')
+def detay_sayfasi(program_kodu):
+    response = make_response(render_template('detay.html', program_kodu=program_kodu))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 # Google Sheets'e veri ekleme
 @app.route('/api/universite', methods=['POST'])
 def add_universite():
@@ -275,7 +283,7 @@ def add_universite():
         
         sheet = client.open_by_key(SHEET_ID).sheet1
         
-        # Yeni satır olarak ekle (Program Adı sütunu dahil)
+        # Yeni satır olarak ekle (tüm sütunlar dahil)
         row_data = [
             data.get('Üniversite Adı', ''),
             data.get('Program Kodu', ''),
@@ -286,7 +294,15 @@ def add_universite():
             data.get('Program Adı', ''),
             data.get('Kontenjan', ''),
             data.get('2024 Başarı Sırası', ''),
-            data.get('2024 YKS En Küçük Puanı', '')
+            data.get('2024 YKS En Küçük Puanı', ''),
+            data.get('Kuruluş Tarihi', ''),
+            data.get('Adres', ''),
+            data.get('Telefon', ''),
+            data.get('E-posta', ''),
+            data.get('Rektör', ''),
+            data.get('Üni Alan Adı', ''),
+            data.get('Fakülte Alan adı', ''),
+            data.get('Bölüm Alan Adı', '')
         ]
         
         sheet.append_row(row_data)
@@ -327,7 +343,7 @@ def update_universite(program_kodu):
         
         # Güncellenecek alanları belirle
         update_data = []
-        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']:
+        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı']:
             if field in data:
                 update_data.append(data[field])
             else:
@@ -335,8 +351,8 @@ def update_universite(program_kodu):
                 cell_value = sheet.cell(row_index, all_records[0].keys().index(field) + 1).value
                 update_data.append(cell_value)
         
-        # Satırı güncelle (9 sütun için A-I aralığı)
-        sheet.update(f'A{row_index}:J{row_index}', [update_data])
+        # Satırı güncelle (19 sütun için A-S aralığı)
+        sheet.update(f'A{row_index}:S{row_index}', [update_data])
         
         return jsonify({'message': 'Üniversite başarıyla güncellendi', 'data': data}), 200
         

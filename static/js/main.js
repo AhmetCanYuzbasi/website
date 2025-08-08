@@ -289,6 +289,9 @@ async function showUniversityDetail(programKodu) {
                 <i class="fas fa-university me-2"></i>${university['Üniversite Adı']}
             `;
             
+            // Detaylar butonunu güncelle
+            document.getElementById('detaylarBtn').href = `/detay/${university['Program Kodu']}`;
+            
             document.getElementById('modalBody').innerHTML = `
                 <div class="row">
                     <div class="col-md-6">
@@ -332,6 +335,7 @@ async function showUniversityDetail(programKodu) {
                         </div>
                     </div>
                 </div>
+
             `;
             
             detailModal.show();

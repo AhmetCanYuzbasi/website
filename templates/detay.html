@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Üniversite Detayları - BMO Bilgi Bankası</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            padding: 30px;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .detail-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .detail-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .detail-value {
+            color: #7f8c8d;
+            font-size: 1em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 100px;
+            color: #7f8c8d;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .contact-info {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .website-links {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .website-link {
+            display: inline-block;
+            background: white;
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .website-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: #2c3e50;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .stats-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="main-container">
+                    <!-- Header -->
+                    <div class="header-section">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h1 class="display-5 fw-bold">
+                                    <i class="fas fa-university me-3"></i>
+                                    Üniversite Detayları
+                                </h1>
+                                <p class="lead mb-0">Tüm bilgiler ve iletişim detayları</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <a href="/" class="btn back-btn">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Ana Sayfaya Dön
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading -->
+                    <div id="loadingSection" class="loading">
+                        <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                        <h4>Üniversite bilgileri yükleniyor...</h4>
+                    </div>
+
+                    <!-- Content -->
+                    <div id="contentSection" style="display: none;">
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-number" id="kontenjanStats">-</div>
+                                    <div class="stats-label">Kontenjan</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-number" id="puanStats">-</div>
+                                    <div class="stats-label">2024 YKS Puanı</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-number" id="siralamaStats">-</div>
+                                    <div class="stats-label">Başarı Sırası</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card">
+                                    <div class="stats-number" id="kurulusStats">-</div>
+                                    <div class="stats-label">Kuruluş Yılı</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="detail-card">
+                            <h3><i class="fas fa-info-circle me-2 text-primary"></i>Temel Bilgiler</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Üniversite Adı:</span>
+                                        <span class="detail-value" id="universiteAdi">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Program Kodu:</span>
+                                        <span class="detail-value" id="programKodu">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Fakülte Adı:</span>
+                                        <span class="detail-value" id="fakulteAdi">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Program Adı:</span>
+                                        <span class="detail-value" id="programAdi">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Ülke:</span>
+                                        <span class="detail-value" id="ulke">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Şehir:</span>
+                                        <span class="detail-value" id="sehir">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Grup:</span>
+                                        <span class="detail-value" id="grup">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Kuruluş Tarihi:</span>
+                                        <span class="detail-value" id="kurulusTarihi">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="detail-card">
+                            <h3><i class="fas fa-address-book me-2 text-primary"></i>İletişim Bilgileri</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Adres:</span>
+                                        <span class="detail-value" id="adres">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Telefon:</span>
+                                        <span class="detail-value" id="telefon">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <span class="detail-label">E-posta:</span>
+                                        <span class="detail-value" id="eposta">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Rektör:</span>
+                                        <span class="detail-value" id="rektor">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Website Links -->
+                        <div class="detail-card">
+                            <h3><i class="fas fa-globe me-2 text-primary"></i>İnternet Siteleri</h3>
+                            <div class="website-links">
+                                <a href="#" id="uniWebsite" class="website-link" target="_blank">
+                                    <i class="fas fa-university me-2"></i>
+                                    Üniversite Web Sitesi
+                                </a>
+                                <a href="#" id="fakulteWebsite" class="website-link" target="_blank">
+                                    <i class="fas fa-graduation-cap me-2"></i>
+                                    Fakülte Web Sitesi
+                                </a>
+                                <a href="#" id="bolumWebsite" class="website-link" target="_blank">
+                                    <i class="fas fa-book me-2"></i>
+                                    Bölüm Web Sitesi
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="errorSection" style="display: none;" class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4 class="text-danger">Hata</h4>
+                        <p class="text-muted" id="errorMessage">Üniversite bilgileri yüklenirken bir hata oluştu.</p>
+                        <a href="/" class="btn back-btn">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Ana Sayfaya Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Program kodu'nu URL'den al
+        const programKodu = '{{ program_kodu }}';
+        
+        // Sayfa yüklendiğinde verileri yükle
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUniversityDetails();
+        });
+        
+        async function loadUniversityDetails() {
+            try {
+                const response = await fetch(`/api/universite/${programKodu}`);
+                const university = await response.json();
+                
+                if (response.ok) {
+                    displayUniversityDetails(university);
+                } else {
+                    showError('Üniversite bulunamadı');
+                }
+            } catch (error) {
+                console.error('Error loading university details:', error);
+                showError('Üniversite bilgileri yüklenirken bir hata oluştu');
+            }
+        }
+        
+        function displayUniversityDetails(university) {
+            // Stats
+            document.getElementById('kontenjanStats').textContent = university['Kontenjan'] || '-';
+            document.getElementById('puanStats').textContent = university['2024 YKS En Küçük Puanı'] || '-';
+            document.getElementById('siralamaStats').textContent = university['2024 Başarı Sırası'] || '-';
+            document.getElementById('kurulusStats').textContent = university['Kuruluş Tarihi'] || '-';
+            
+            // Basic Info
+            document.getElementById('universiteAdi').textContent = university['Üniversite Adı'] || '-';
+            document.getElementById('programKodu').textContent = university['Program Kodu'] || '-';
+            document.getElementById('fakulteAdi').textContent = university['Fakülte Adı'] || '-';
+            document.getElementById('programAdi').textContent = university['Program Adı'] || '-';
+            document.getElementById('ulke').textContent = university['Ülke'] || '-';
+            document.getElementById('sehir').textContent = university['Şehir'] || '-';
+            document.getElementById('grup').textContent = university['Grup'] || '-';
+            document.getElementById('kurulusTarihi').textContent = university['Kuruluş Tarihi'] || '-';
+            
+            // Contact Info
+            document.getElementById('adres').textContent = university['Adres'] || '-';
+            document.getElementById('telefon').textContent = university['Telefon'] || '-';
+            document.getElementById('eposta').textContent = university['E-posta'] || '-';
+            document.getElementById('rektor').textContent = university['Rektör'] || '-';
+            
+            // Website Links
+            const uniWebsite = document.getElementById('uniWebsite');
+            const fakulteWebsite = document.getElementById('fakulteWebsite');
+            const bolumWebsite = document.getElementById('bolumWebsite');
+            
+            if (university['Üni Alan Adı']) {
+                uniWebsite.href = university['Üni Alan Adı'];
+                uniWebsite.style.display = 'inline-block';
+            } else {
+                uniWebsite.style.display = 'none';
+            }
+            
+            if (university['Fakülte Alan adı']) {
+                fakulteWebsite.href = university['Fakülte Alan adı'];
+                fakulteWebsite.style.display = 'inline-block';
+            } else {
+                fakulteWebsite.style.display = 'none';
+            }
+            
+            if (university['Bölüm Alan Adı']) {
+                bolumWebsite.href = university['Bölüm Alan Adı'];
+                bolumWebsite.style.display = 'inline-block';
+            } else {
+                bolumWebsite.style.display = 'none';
+            }
+            
+            // Show content
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('contentSection').style.display = 'block';
+        }
+        
+        function showError(message) {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+    </script>
+</body>
+</html>
