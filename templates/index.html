@@ -209,6 +209,316 @@
             border-color: var(--primary-color) !important;
         }
 
+        /* Dropdown seçenekleri için stil */
+        .form-select option {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+
+        .form-select option:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .form-select option:checked {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Arama input'u için autocomplete seçenekleri */
+        .search-input {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        /* Autocomplete dropdown için stil */
+        .autocomplete-items {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-top: none !important;
+            z-index: 99 !important;
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            max-height: 300px !important;
+            overflow-y: auto !important;
+            border-radius: 0 0 15px 15px !important;
+        }
+
+        .autocomplete-items div {
+            padding: 10px !important;
+            cursor: pointer !important;
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .autocomplete-items div:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .autocomplete-active {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Tarayıcı autocomplete için güçlü kurallar */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--dark-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+        }
+
+        /* Chrome/Safari autocomplete dropdown */
+        input::-webkit-calendar-picker-indicator {
+            filter: invert(1) !important;
+        }
+
+        /* Firefox autocomplete */
+        input:-moz-autofill {
+            background-color: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Genel autocomplete dropdown override */
+        *::-webkit-autofill,
+        *::-webkit-autofill:hover,
+        *::-webkit-autofill:focus,
+        *::-webkit-autofill:active {
+            background-color: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            -webkit-box-shadow: 0 0 0 30px var(--dark-bg) inset !important;
+        }
+
+        /* Datalist ve autocomplete için */
+        datalist {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        datalist option {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Tüm dropdown elementleri için */
+        select, input, textarea {
+            background-color: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Autocomplete listesi için */
+        .autocomplete-list,
+        .autocomplete-suggestions,
+        .suggestions {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .autocomplete-list li,
+        .autocomplete-suggestions li,
+        .suggestions li {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .autocomplete-list li:hover,
+        .autocomplete-suggestions li:hover,
+        .suggestions li:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Tarayıcı autocomplete dropdown override - ÇOK GÜÇLÜ */
+        input::-webkit-autofill,
+        input::-webkit-autofill:hover,
+        input::-webkit-autofill:focus,
+        input::-webkit-autofill:active,
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--dark-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            background-color: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+        }
+
+        /* Chrome autocomplete dropdown */
+        input::-webkit-calendar-picker-indicator {
+            filter: invert(1) !important;
+        }
+
+        /* Firefox autocomplete */
+        input:-moz-autofill {
+            background-color: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Tüm autocomplete dropdown'ları için */
+        *::-webkit-autofill,
+        *::-webkit-autofill:hover,
+        *::-webkit-autofill:focus,
+        *::-webkit-autofill:active {
+            background-color: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            -webkit-box-shadow: 0 0 0 30px var(--dark-bg) inset !important;
+        }
+
+        /* Chrome autocomplete suggestions */
+        input::-webkit-autofill,
+        input::-webkit-autofill:hover,
+        input::-webkit-autofill:focus,
+        input::-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--dark-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+        }
+
+        /* Autocomplete dropdown container */
+        .autocomplete-container,
+        .autocomplete-wrapper,
+        .search-suggestions {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Autocomplete dropdown items */
+        .autocomplete-container div,
+        .autocomplete-wrapper div,
+        .search-suggestions div,
+        .autocomplete-container li,
+        .autocomplete-wrapper li,
+        .search-suggestions li {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .autocomplete-container div:hover,
+        .autocomplete-wrapper div:hover,
+        .search-suggestions div:hover,
+        .autocomplete-container li:hover,
+        .autocomplete-wrapper li:hover,
+        .search-suggestions li:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* JavaScript autocomplete için */
+        #searchInput + div,
+        #searchInput ~ div,
+        .search-container div {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        #searchInput + div div,
+        #searchInput ~ div div,
+        .search-container div div {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        #searchInput + div div:hover,
+        #searchInput ~ div div:hover,
+        .search-container div div:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Autocomplete listesi için özel kurallar */
+        #autocomplete-list {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-top: none !important;
+            border-radius: 0 0 15px 15px !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+            max-height: 300px !important;
+            overflow-y: auto !important;
+        }
+
+        #autocomplete-list .list-group-item {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border: none !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            padding: 12px 15px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        #autocomplete-list .list-group-item:last-child {
+            border-bottom: none !important;
+            border-radius: 0 0 15px 15px !important;
+        }
+
+        #autocomplete-list .list-group-item:hover,
+        #autocomplete-list .list-group-item:focus {
+            background: var(--primary-color) !important;
+            color: white !important;
+            transform: translateX(5px) !important;
+        }
+
+        #autocomplete-list .list-group-item:active {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Bootstrap list-group override */
+        .list-group {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+
+        .list-group-item {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        .list-group-item:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .list-group-item-action:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .list-group-item-action:focus {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .list-group-item-action:active {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
         .sort-btn {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
