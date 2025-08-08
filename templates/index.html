@@ -10,159 +10,450 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --accent-color: #ff6b35;
+            --dark-bg: #0a1929;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #b0bec5;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #2d3748 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
         }
-        
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 153, 204, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-10px) translateY(-10px); }
+            50% { transform: translateX(10px) translateY(-5px); }
+            75% { transform: translateX(-5px) translateY(10px); }
+        }
+
         .main-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
             margin: 20px auto;
             padding: 30px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .search-section {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            color: white;
-        }
-        
-        .filter-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .university-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .university-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        
-        .university-name {
-            color: #2c3e50;
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-        
-        .university-info {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        
-        .modal-content {
-            border-radius: 20px;
-            border: none;
-        }
-        
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 20px 20px 0 0;
-        }
-        
-        .detail-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        
-        .detail-label {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .detail-value {
-            color: #7f8c8d;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: #7f8c8d;
-        }
-        
-        .sort-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin: 2px;
-            transition: background 0.3s ease;
-        }
-        
-        .sort-btn:hover {
-            background: #2980b9;
-        }
-        
-        .sort-btn.active {
-            background: #e74c3c;
-        }
-        .autocomplete-items {
-            top: 100%;
+
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
             left: 0;
             right: 0;
-            max-height: 300px;
-            overflow-y: auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            animation: scanLine 3s ease-in-out infinite;
         }
-        .modal-dialog {
-            max-width: 1200px;
-            width: 95vw;
-            margin: 1.75rem auto;
-            display: flex;
-            align-items: center;
-            min-height: calc(100vh - 3.5rem);
+
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
-        .modal.fade .modal-dialog {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+
+        .header-section {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
         }
-        @media (max-width: 1400px) {
-            .modal-dialog {
-                max-width: 98vw;
-                min-width: 95vw;
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-glow {
+            text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color);
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color); }
+            50% { text-shadow: 0 0 30px var(--primary-color), 0 0 60px var(--primary-color); }
+        }
+
+        .company-name-glow {
+            color: var(--text-primary);
+            font-weight: bold;
+            font-size: 1.5em;
+            text-shadow: 0 0 15px var(--text-primary), 0 0 30px var(--text-primary);
+            animation: companyPulse 3s ease-in-out infinite;
+            margin-top: 15px;
+            letter-spacing: 2px;
+        }
+
+        @keyframes companyPulse {
+            0%, 100% { 
+                text-shadow: 0 0 15px var(--text-primary), 0 0 30px var(--text-primary);
+                transform: scale(1);
             }
+            50% { 
+                text-shadow: 0 0 25px var(--text-primary), 0 0 50px var(--text-primary), 0 0 75px rgba(255, 255, 255, 0.3);
+                transform: scale(1.05);
+            }
+        }
+
+        .search-section {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(255, 107, 53, 0.15) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            border: none !important;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4);
+        }
+
+        .filter-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .filter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .form-select, .form-control {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-select:focus, .form-control:focus {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .sort-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sort-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .sort-btn:hover::before {
+            left: 100%;
+        }
+
+        .sort-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4);
+        }
+
+        .sort-btn.active {
+            background: linear-gradient(135deg, var(--accent-color), #ff8c42);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .university-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .university-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .university-card:hover::before {
+            left: 100%;
+        }
+
+        .university-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .university-name {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .university-info {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 80px;
+            color: var(--text-secondary);
+        }
+
+        .loading i {
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-content {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-body {
+            color: var(--text-primary);
+        }
+
+        .detail-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .detail-value {
+            color: var(--text-secondary);
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .header-section {
+                padding: 20px;
+            }
+            
+            .sort-btn {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
         }
     </style>
 </head>
 <body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="main-container">
                     <!-- Header -->
-                    <div class="text-center mb-4">
-                        <h1 class="display-4 fw-bold text-primary">
-                            <i class="fas fa-university me-3"></i>
-                            Bilgisayar Mühendisleri Odası'nın Alanına Giren Bölümler Hakkında Bilgi Bankası
-                        </h1>
-                        <p class="lead text-muted">TBK BİLİŞİM SİSTEMLERİ</p>
-                        
-                        <!-- Data Source Status -->
-                        <div id="dataSourceStatus" class="mt-3">
-                            <span class="badge bg-secondary">
-                                <i class="fas fa-spinner fa-spin me-1"></i>
-                                Veri kaynağı kontrol ediliyor...
-                            </span>
+                    <div class="header-section">
+                        <div class="header-content text-center">
+                            <h1 class="display-4 fw-bold title-glow">
+                                <i class="fas fa-microchip me-3"></i>
+                                BMO Bilgi Bankası
+                            </h1>
+                            <p class="lead mb-0">Bilgisayar Mühendisliği Alanındaki Bölümler</p>
+                            <h2 class="company-name-glow">
+                                <i class="fas fa-building me-2"></i>
+                                TBK BİLİŞİM SİSTEMLERİ
+                            </h2>
+                            
+                            <!-- Data Source Status -->
+                            <div id="dataSourceStatus" class="mt-3">
+                                <span class="badge">
+                                    <i class="fas fa-spinner fa-spin me-1"></i>
+                                    Veri kaynağı kontrol ediliyor...
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -171,16 +462,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group position-relative">
-                                    <span class="input-group-text bg-white border-0">
+                                    <span class="input-group-text bg-transparent border-0">
                                         <i class="fas fa-search text-primary"></i>
                                     </span>
-                                    <input type="text" id="searchInput" class="form-control border-0" 
+                                    <input type="text" id="searchInput" class="form-control search-input border-0" 
                                            placeholder="Üniversite adı ara..." style="border-radius: 0 25px 25px 0;">
-                                    <!-- Autocomplete buraya JS ile eklenecek -->
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <button id="searchBtn" class="btn btn-light w-100" style="border-radius: 25px;">
+                                <button id="searchBtn" class="btn search-btn w-100" style="border-radius: 25px;">
                                     <i class="fas fa-search me-2"></i>Ara
                                 </button>
                             </div>
@@ -191,7 +481,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="filter-card">
-                                <h5><i class="fas fa-filter me-2"></i>Filtreler</h5>
+                                <h5><i class="fas fa-filter me-2 text-primary"></i>Filtreler</h5>
                                 <div class="mb-3">
                                     <label class="form-label">Ülke:</label>
                                     <select id="ulkeFilter" class="form-select">
@@ -218,7 +508,7 @@
 
                         <div class="col-md-8">
                             <div class="filter-card">
-                                <h5><i class="fas fa-sort me-2"></i>Sıralama</h5>
+                                <h5><i class="fas fa-sort me-2 text-primary"></i>Sıralama</h5>
                                 <div class="d-flex flex-wrap">
                                     <button class="sort-btn" data-sort="Üniversite Adı" data-order="asc">
                                         <i class="fas fa-sort-alpha-down me-1"></i>Üniversite Adı
@@ -240,8 +530,8 @@
                     <!-- Results -->
                     <div id="resultsContainer">
                         <div class="loading">
-                            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
-                            <p>Üniversiteler yükleniyor...</p>
+                            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+                            <h4>Üniversiteler yükleniyor...</h4>
                         </div>
                     </div>
                 </div>
@@ -276,5 +566,27 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/main.js"></script>
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+    </script>
 </body>
 </html> 

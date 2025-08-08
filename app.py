@@ -171,6 +171,8 @@ def index():
     response.headers['Expires'] = '0'
     return response
 
+
+
 @app.route('/api/universiteler')
 def get_universiteler():
     df = load_data()
