@@ -15,9 +15,11 @@ const clearFiltersBtn = document.getElementById('clearFilters');
 const resultsContainer = document.getElementById('resultsContainer');
 const sortButtons = document.querySelectorAll('.sort-btn');
 const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+const dataSourceStatus = document.getElementById('dataSourceStatus');
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    checkDataSourceStatus();
     loadFilters();
     loadUniversities();
     
@@ -109,6 +111,45 @@ function createAutocomplete() {
             autocompleteList.style.display = 'none';
         }
     });
+}
+
+// Check data source status
+async function checkDataSourceStatus() {
+    try {
+        const response = await fetch('/api/status');
+        const status = await response.json();
+        
+        if (status.sheets_connected && status.sheet_configured) {
+            dataSourceStatus.innerHTML = `
+                <span class="badge bg-success">
+                    <i class="fas fa-cloud me-1"></i>
+                    Google Sheets Bağlı (${status.data_count} kayıt)
+                </span>
+            `;
+        } else if (status.data_source === 'Excel File') {
+            dataSourceStatus.innerHTML = `
+                <span class="badge bg-warning">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel Dosyası (${status.data_count} kayıt)
+                </span>
+            `;
+        } else {
+            dataSourceStatus.innerHTML = `
+                <span class="badge bg-danger">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Veri Kaynağı Hatası
+                </span>
+            `;
+        }
+    } catch (error) {
+        console.error('Status check error:', error);
+        dataSourceStatus.innerHTML = `
+            <span class="badge bg-danger">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Bağlantı Hatası
+            </span>
+        `;
+    }
 }
 
 // Load filter options

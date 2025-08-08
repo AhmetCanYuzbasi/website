@@ -1,27 +1,130 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 import pandas as pd
 import os
 import unicodedata
 import numpy as np
 import locale
-#locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')  # Türkçe sıralama
-try:
-    locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')
-except locale.Error:
-    locale.setlocale(locale.LC_COLLATE, '')  # Sistem varsayılanına geç
+import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime, timedelta
+import json
+
+locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')  # Türkçe sıralama
 
 app = Flask(__name__)
 
+# Google Sheets API ayarları
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
 
-# Türkçe sıralama anahtarı
-TURKISH_ALPHABET = 'a b c ç d e f g ğ h ı i j k l m n o ö p r s ş t u ü v y z'.split()
-TURKISH_ORDER = {char: idx for idx, char in enumerate(TURKISH_ALPHABET)}
-def turkish_key(s):
-    s = str(s).lower()
-    return [TURKISH_ORDER.get(char, ord(char)) for char in s]
+# Google Sheets bağlantısı
+def get_google_sheets_client():
+    try:
+        # Önce environment variable'dan credentials'ı kontrol et (Render için)
+        google_credentials = os.environ.get('GOOGLE_CREDENTIALS')
+        
+        if google_credentials:
+            # Environment variable'dan credentials oluştur
+            import json
+            creds_dict = json.loads(google_credentials)
+            creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+            print("✅ Environment variable'dan credentials yüklendi")
+        elif os.path.exists('credentials.json'):
+            # Dosyadan credentials yükle (local development için)
+            creds = Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
+            print("✅ credentials.json dosyasından yüklendi")
+        else:
+            # Credentials bulunamadı
+            print("❌ Google Sheets credentials bulunamadı!")
+            print("💡 Render'da GOOGLE_CREDENTIALS environment variable'ını ayarlayın")
+            print("💡 Local'de credentials.json dosyasını oluşturun")
+            return None
+        
+        if creds:
+            client = gspread.authorize(creds)
+            return client
+        else:
+            return None
+    except Exception as e:
+        print(f"Google Sheets bağlantı hatası: {e}")
+        return None
 
-# Excel dosyasını yükle
-def load_data():
+# Google Sheets'ten veri yükleme
+def load_data_from_sheets():
+    try:
+        client = get_google_sheets_client()
+        if not client:
+            print("Google Sheets bağlantısı kurulamadı, Excel dosyası kullanılıyor...")
+            return load_data_from_excel()
+        
+        # Google Sheets ID'sini buraya ekleyin
+        # Sheets URL'sinden alabilirsiniz: https://docs.google.com/spreadsheets/d/SHEET_ID/edit
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')  # Environment variable'dan al
+        
+        if not SHEET_ID:
+            print("GOOGLE_SHEET_ID environment variable'ı ayarlanmamış, Excel dosyası kullanılıyor...")
+            return load_data_from_excel()
+        
+        # Sheet'i aç
+        sheet = client.open_by_key(SHEET_ID).sheet1
+        
+        # Ham veriyi al (formatlanmamış)
+        all_values = sheet.get_all_values()
+        
+        if not all_values or len(all_values) < 2:
+            print("Google Sheets'te veri bulunamadı, Excel dosyası kullanılıyor...")
+            return load_data_from_excel()
+        
+        # Başlıkları al
+        headers = all_values[0]
+        
+        # Veri satırlarını al
+        data_rows = all_values[1:]
+        
+        # DataFrame oluştur
+        df = pd.DataFrame(data_rows, columns=headers)
+        print(f'Google Sheets\'ten {len(df)} satır veri yüklendi')
+        print('Google Sheets başlıkları:', list(df.columns))
+        
+        # Sütun yapısını kontrol et ve gerekirse düzenle
+        expected_columns = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
+        
+        # Eksik sütunları kontrol et
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        if missing_columns:
+            print(f'Eksik sütunlar: {missing_columns}')
+            print('Excel dosyası kullanılıyor...')
+            return load_data_from_excel()
+        
+        # Sayısal sütunları düzelt
+        numeric_columns = ['Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
+        
+        for col in numeric_columns:
+            if col in df.columns:
+                if col == '2024 YKS En Küçük Puanı':
+                    # YKS puanı için virgülü nokta ile değiştir (ondalık sayı)
+                    df[col] = df[col].astype(str).str.replace(',', '.').str.replace(' ', '')
+                else:
+                    # Diğer sayılar için virgülü kaldır (tam sayı)
+                    df[col] = df[col].astype(str).str.replace(',', '').str.replace(' ', '')
+                
+                # Sayısal değerlere çevir
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+                
+                print(f'✅ {col} sütunu düzeltildi')
+                print(f'   Örnek değerler: {df[col].head().tolist()}')
+        
+        return df
+        
+    except Exception as e:
+        print(f'Google Sheets okuma hatası: {e}')
+        print("Excel dosyası kullanılıyor...")
+        return load_data_from_excel()
+
+# Excel dosyasından veri yükleme (fallback)
+def load_data_from_excel():
     try:
         # Excel dosyasını yükle (dosya adını kendi dosyanızla değiştirin)
         df = pd.read_excel('toplantı tablo 1.xlsx')
@@ -43,9 +146,25 @@ def load_data():
         }
         return pd.DataFrame(data)
 
+# Ana veri yükleme fonksiyonu
+def load_data():
+    return load_data_from_sheets()
+
+
+# Türkçe sıralama anahtarı
+TURKISH_ALPHABET = 'a b c ç d e f g ğ h ı i j k l m n o ö p r s ş t u ü v y z'.split()
+TURKISH_ORDER = {char: idx for idx, char in enumerate(TURKISH_ALPHABET)}
+def turkish_key(s):
+    s = str(s).lower()
+    return [TURKISH_ORDER.get(char, ord(char)) for char in s]
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api/universiteler')
 def get_universiteler():
@@ -122,16 +241,166 @@ def get_universite_detay(program_kodu):
     universite = universite.where(pd.notnull(universite), None)
     return jsonify(universite.iloc[0].to_dict())
 
+# Google Sheets'e veri ekleme
+@app.route('/api/universite', methods=['POST'])
+def add_universite():
+    try:
+        data = request.get_json()
+        
+        # Gerekli alanları kontrol et
+        required_fields = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Şehir', 'Grup']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({'error': f'{field} alanı zorunludur'}), 400
+        
+        client = get_google_sheets_client()
+        if not client:
+            return jsonify({'error': 'Google Sheets bağlantısı kurulamadı'}), 500
+        
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
+        if not SHEET_ID:
+            return jsonify({'error': 'GOOGLE_SHEET_ID ayarlanmamış'}), 500
+        
+        sheet = client.open_by_key(SHEET_ID).sheet1
+        
+        # Yeni satır olarak ekle (Program Adı sütunu dahil)
+        row_data = [
+            data.get('Üniversite Adı', ''),
+            data.get('Program Kodu', ''),
+            data.get('Fakülte Adı', ''),
+            data.get('Şehir', ''),
+            data.get('Grup', ''),
+            data.get('Program Adı', ''),
+            data.get('Kontenjan', ''),
+            data.get('2024 Başarı Sırası', ''),
+            data.get('2024 YKS En Küçük Puanı', '')
+        ]
+        
+        sheet.append_row(row_data)
+        
+        return jsonify({'message': 'Üniversite başarıyla eklendi', 'data': data}), 201
+        
+    except Exception as e:
+        print(f'Veri ekleme hatası: {e}')
+        return jsonify({'error': 'Veri eklenirken hata oluştu'}), 500
+
+# Google Sheets'te veri güncelleme
+@app.route('/api/universite/<program_kodu>', methods=['PUT'])
+def update_universite(program_kodu):
+    try:
+        data = request.get_json()
+        
+        client = get_google_sheets_client()
+        if not client:
+            return jsonify({'error': 'Google Sheets bağlantısı kurulamadı'}), 500
+        
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
+        if not SHEET_ID:
+            return jsonify({'error': 'GOOGLE_SHEET_ID ayarlanmamış'}), 500
+        
+        sheet = client.open_by_key(SHEET_ID).sheet1
+        
+        # Program koduna göre satırı bul
+        all_records = sheet.get_all_records()
+        row_index = None
+        
+        for i, record in enumerate(all_records, start=2):  # 2'den başla çünkü 1. satır başlık
+            if str(record.get('Program Kodu', '')).strip() == str(program_kodu).strip():
+                row_index = i
+                break
+        
+        if row_index is None:
+            return jsonify({'error': 'Üniversite bulunamadı'}), 404
+        
+        # Güncellenecek alanları belirle
+        update_data = []
+        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']:
+            if field in data:
+                update_data.append(data[field])
+            else:
+                # Mevcut değeri koru
+                cell_value = sheet.cell(row_index, all_records[0].keys().index(field) + 1).value
+                update_data.append(cell_value)
+        
+        # Satırı güncelle (9 sütun için A-I aralığı)
+        sheet.update(f'A{row_index}:I{row_index}', [update_data])
+        
+        return jsonify({'message': 'Üniversite başarıyla güncellendi', 'data': data}), 200
+        
+    except Exception as e:
+        print(f'Veri güncelleme hatası: {e}')
+        return jsonify({'error': 'Veri güncellenirken hata oluştu'}), 500
+
+# Google Sheets'ten veri silme
+@app.route('/api/universite/<program_kodu>', methods=['DELETE'])
+def delete_universite(program_kodu):
+    try:
+        client = get_google_sheets_client()
+        if not client:
+            return jsonify({'error': 'Google Sheets bağlantısı kurulamadı'}), 500
+        
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
+        if not SHEET_ID:
+            return jsonify({'error': 'GOOGLE_SHEET_ID ayarlanmamış'}), 500
+        
+        sheet = client.open_by_key(SHEET_ID).sheet1
+        
+        # Program koduna göre satırı bul
+        all_records = sheet.get_all_records()
+        row_index = None
+        
+        for i, record in enumerate(all_records, start=2):
+            if str(record.get('Program Kodu', '')).strip() == str(program_kodu).strip():
+                row_index = i
+                break
+        
+        if row_index is None:
+            return jsonify({'error': 'Üniversite bulunamadı'}), 404
+        
+        # Satırı sil
+        sheet.delete_rows(row_index)
+        
+        return jsonify({'message': 'Üniversite başarıyla silindi'}), 200
+        
+    except Exception as e:
+        print(f'Veri silme hatası: {e}')
+        return jsonify({'error': 'Veri silinirken hata oluştu'}), 500
+
+# Veri kaynağı durumu kontrolü
+@app.route('/api/status')
+def get_status():
+    try:
+        client = get_google_sheets_client()
+        sheets_connected = client is not None
+        
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
+        sheet_configured = bool(SHEET_ID)
+        
+        df = load_data()
+        data_count = len(df) if df is not None else 0
+        
+        return jsonify({
+            'sheets_connected': sheets_connected,
+            'sheet_configured': sheet_configured,
+            'data_source': 'Google Sheets' if sheets_connected and sheet_configured else 'Excel File',
+            'data_count': data_count,
+            'last_updated': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'sheets_connected': False,
+            'sheet_configured': False,
+            'data_source': 'Error'
+        }), 500
+
 #if __name__ == '__main__':
 #    app.run(debug=True) 
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
-
-
-    
+    app.run(host='0.0.0.0', port=port, debug=False)
 
     
-
+    
