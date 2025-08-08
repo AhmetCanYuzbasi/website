@@ -15,7 +15,6 @@ try:
     locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')
 except locale.Error:
     locale.setlocale(locale.LC_COLLATE, '')  # Sistem varsayılanına geç
-  # Türkçe sıralama
 
 app = Flask(__name__)
 
@@ -95,7 +94,7 @@ def load_data_from_sheets():
         print('Google Sheets başlıkları:', list(df.columns))
         
         # Sütun yapısını kontrol et ve gerekirse düzenle
-        expected_columns = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
+        expected_columns = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı','Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
         
         # Eksik sütunları kontrol et
         missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -274,6 +273,7 @@ def add_universite():
             data.get('Üniversite Adı', ''),
             data.get('Program Kodu', ''),
             data.get('Fakülte Adı', ''),
+            data.get('Ülke', ''),
             data.get('Şehir', ''),
             data.get('Grup', ''),
             data.get('Program Adı', ''),
@@ -320,7 +320,7 @@ def update_universite(program_kodu):
         
         # Güncellenecek alanları belirle
         update_data = []
-        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']:
+        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']:
             if field in data:
                 update_data.append(data[field])
             else:
@@ -329,7 +329,7 @@ def update_universite(program_kodu):
                 update_data.append(cell_value)
         
         # Satırı güncelle (9 sütun için A-I aralığı)
-        sheet.update(f'A{row_index}:I{row_index}', [update_data])
+        sheet.update(f'A{row_index}:J{row_index}', [update_data])
         
         return jsonify({'message': 'Üniversite başarıyla güncellendi', 'data': data}), 200
         
@@ -409,5 +409,4 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=False)
 
     
-
     
