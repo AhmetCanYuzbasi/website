@@ -9,7 +9,13 @@ from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
 import json
 
-locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')  # Türkçe sıralama
+import locale
+
+try:
+    locale.setlocale(locale.LC_COLLATE, 'tr_TR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_COLLATE, '')  # Sistem varsayılanına geç
+  # Türkçe sıralama
 
 app = Flask(__name__)
 
@@ -403,4 +409,5 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=False)
 
     
+
     
