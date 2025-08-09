@@ -380,7 +380,7 @@
                                 </a>
                                 <h1 class="title-glow mb-0">
                                     <i class="fas fa-university me-3"></i>
-                                    <span id="universiteAdi">Üniversite Adı</span> Detayları
+                                    <span id="headerUniversiteAdi">Üniversite Adı</span> Detayları
                                 </h1>
                             </div>
                                                          <div id="loadingIndicator" class="text-center">
@@ -647,8 +647,33 @@
             document.getElementById('siralama').textContent = data['2024 Başarı Sırası'] || '-';
             document.getElementById('kurulus').textContent = data['Kuruluş Tarihi'] || '-';
 
+            // Function to format university name with line breaks at parentheses
+            function formatUniversityName(name) {
+                if (!name) return '-';
+                // Find the first opening parenthesis and split there
+                const parenIndex = name.indexOf('(');
+                if (parenIndex !== -1) {
+                    const beforeParen = name.substring(0, parenIndex).trim();
+                    const afterParen = name.substring(parenIndex).trim();
+                    return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                }
+                return name;
+            }
+
             // Basic information
-            document.getElementById('universiteAdi').textContent = data['Üniversite Adı'] || '-';
+            const universiteAdi = data['Üniversite Adı'] || '-';
+            
+            // Update header title with formatted name
+            const headerSpan = document.querySelector('#headerUniversiteAdi');
+            if (headerSpan) {
+                headerSpan.innerHTML = formatUniversityName(universiteAdi);
+            }
+            
+            // Update content area university name
+            const contentUniversiteAdi = document.getElementById('universiteAdi');
+            if (contentUniversiteAdi) {
+                contentUniversiteAdi.innerHTML = formatUniversityName(universiteAdi);
+            }
             document.getElementById('programKodu').textContent = data['Program Kodu'] || '-';
             document.getElementById('fakulteAdi').textContent = data['Fakülte Adı'] || '-';
             document.getElementById('programAdi').textContent = data['Program Adı'] || '-';
