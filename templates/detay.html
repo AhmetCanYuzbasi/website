@@ -489,6 +489,12 @@
                                                  <div class="info-value" id="kurulusTarihi">-</div>
                                              </div>
                                          </div>
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">Tür</div>
+                                                 <div class="info-value" id="tur">-</div>
+                                             </div>
+                                         </div>
                                      </div>
                                  </div>
                              </div>
@@ -681,6 +687,7 @@
             document.getElementById('sehir').textContent = data['Şehir'] || '-';
             document.getElementById('grup').textContent = data['Grup'] || '-';
             document.getElementById('kurulusTarihi').textContent = data['Kuruluş Tarihi'] || '-';
+            document.getElementById('tur').textContent = data['Tür'] || '-';
 
             // Contact information
             document.getElementById('adres').textContent = data['Adres'] || '-';

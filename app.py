@@ -184,6 +184,7 @@ def get_universiteler():
     ulke = request.args.get('ulke', '')
     sehir = request.args.get('sehir', '')
     grup = request.args.get('grup', '')
+    tur = request.args.get('tur', '')
     sort_by = request.args.get('sort_by', 'Üniversite Adı')
     sort_order = request.args.get('sort_order', 'asc')
     
@@ -217,6 +218,10 @@ def get_universiteler():
     if grup:
         df = df[df['Grup'] == grup]
     
+    # Tür filtresi
+    if tur and 'Tür' in df.columns:
+        df = df[df['Tür'] == tur]
+    
     # Sıralama
     if sort_by in df.columns:
         if sort_by == 'Üniversite Adı':
@@ -237,11 +242,71 @@ def get_filtreler():
     sehirler = sorted(df['Şehir'].unique().tolist())
     gruplar = sorted(df['Grup'].unique().tolist())
     
+    # Tür sütunu varsa ekle
+    turler = []
+    if 'Tür' in df.columns:
+        turler = sorted(df['Tür'].unique().tolist())
+    
     return jsonify({
         'ulkeler': ulkeler,
         'sehirler': sehirler,
-        'gruplar': gruplar
+        'gruplar': gruplar,
+        'turler': turler
     })
+
+@app.route('/api/sehirler')
+def get_sehirler():
+    df = load_data()
+    ulke = request.args.get('ulke', '')
+    
+    if ulke:
+        # Belirli ülkeye göre şehirler
+        filtered_df = df[df['Ülke'] == ulke]
+        sehirler = sorted(filtered_df['Şehir'].unique().tolist())
+    else:
+        # Tüm şehirler
+        sehirler = sorted(df['Şehir'].unique().tolist())
+    
+    return jsonify({
+        'sehirler': sehirler
+    })
+
+@app.route('/api/dinamik-filtreler')
+def get_dinamik_filtreler():
+    df = load_data()
+    
+    # Mevcut filtreleri al
+    ulke = request.args.get('ulke', '')
+    sehir = request.args.get('sehir', '')
+    grup = request.args.get('grup', '')
+    tur = request.args.get('tur', '')
+    
+    # DataFrame'i mevcut filtrelere göre filtrele
+    filtered_df = df.copy()
+    
+    if ulke:
+        filtered_df = filtered_df[filtered_df['Ülke'] == ulke]
+    if sehir:
+        filtered_df = filtered_df[filtered_df['Şehir'] == sehir]
+    if grup:
+        filtered_df = filtered_df[filtered_df['Grup'] == grup]
+    if tur and 'Tür' in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df['Tür'] == tur]
+    
+    # Filtrelenmiş veriye göre seçenekleri döndür
+    result = {
+        'ulkeler': sorted(df['Ülke'].unique().tolist()),  # Ülkeler her zaman tam liste
+        'sehirler': sorted(filtered_df['Şehir'].unique().tolist()),
+        'gruplar': sorted(filtered_df['Grup'].unique().tolist()),
+    }
+    
+    # Tür sütunu varsa ekle
+    if 'Tür' in filtered_df.columns:
+        result['turler'] = sorted(filtered_df['Tür'].unique().tolist())
+    else:
+        result['turler'] = []
+    
+    return jsonify(result)
 
 @app.route('/api/universite/<program_kodu>')
 def get_universite_detay(program_kodu):

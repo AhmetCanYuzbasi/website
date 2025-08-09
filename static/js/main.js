@@ -5,6 +5,7 @@ let currentSearch = '';
 let currentUlke = '';
 let currentSehir = '';
 let currentGrup = '';
+let currentTur = '';
 let autocompleteList;
 
 // DOM elements
@@ -13,6 +14,7 @@ const searchBtn = document.getElementById('searchBtn');
 const ulkeFilter = document.getElementById('ulkeFilter');
 const sehirFilter = document.getElementById('sehirFilter');
 const grupFilter = document.getElementById('grupFilter');
+const turFilter = document.getElementById('turFilter');
 const clearFiltersBtn = document.getElementById('clearFilters');
 const resultsContainer = document.getElementById('resultsContainer');
 const sortButtons = document.querySelectorAll('.sort-btn');
@@ -33,10 +35,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Filter functionality
-    ulkeFilter.addEventListener('change', performSearch);
-    sehirFilter.addEventListener('change', performSearch);
-    grupFilter.addEventListener('change', performSearch);
+    // Filter functionality - tüm filtreler birbirine bağlı
+    ulkeFilter.addEventListener('change', function() {
+        updateAllFilters('ulke');
+        performSearch();
+    });
+    sehirFilter.addEventListener('change', function() {
+        updateAllFilters('sehir');
+        performSearch();
+    });
+    grupFilter.addEventListener('change', function() {
+        updateAllFilters('grup');
+        performSearch();
+    });
+    turFilter.addEventListener('change', function() {
+        updateAllFilters('tur');
+        performSearch();
+    });
     clearFiltersBtn.addEventListener('click', clearFilters);
     
     // Sort functionality
@@ -169,7 +184,7 @@ async function loadFilters() {
             ulkeFilter.appendChild(option);
         });
         
-        // Populate city filter
+        // Initially populate city filter with all cities
         data.sehirler.forEach(sehir => {
             const option = document.createElement('option');
             option.value = sehir;
@@ -184,8 +199,88 @@ async function loadFilters() {
             option.textContent = grup;
             grupFilter.appendChild(option);
         });
+        
+        // Populate type filter
+        if (data.turler && data.turler.length > 0) {
+            data.turler.forEach(tur => {
+                const option = document.createElement('option');
+                option.value = tur;
+                option.textContent = tur;
+                turFilter.appendChild(option);
+            });
+        }
     } catch (error) {
         console.error('Error loading filters:', error);
+    }
+}
+
+// Update city filter based on selected country (legacy function)
+async function updateCityFilter() {
+    await updateAllFilters('ulke');
+}
+
+// Update all filters based on current selections
+async function updateAllFilters(changedFilter) {
+    try {
+        // Mevcut seçimleri sakla
+        const currentValues = {
+            ulke: ulkeFilter.value,
+            sehir: sehirFilter.value,
+            grup: grupFilter.value,
+            tur: turFilter.value
+        };
+        
+        // API'den dinamik filtreleri al
+        const params = new URLSearchParams();
+        if (currentValues.ulke) params.append('ulke', currentValues.ulke);
+        if (currentValues.sehir) params.append('sehir', currentValues.sehir);
+        if (currentValues.grup) params.append('grup', currentValues.grup);
+        if (currentValues.tur) params.append('tur', currentValues.tur);
+        
+        const response = await fetch(`/api/dinamik-filtreler?${params}`);
+        const data = await response.json();
+        
+        // Ülke filtresi (her zaman tam liste)
+        updateFilterOptions(ulkeFilter, data.ulkeler, currentValues.ulke);
+        
+        // Diğer filtreler - değişen filtreye göre güncelle
+        if (changedFilter !== 'sehir') {
+            updateFilterOptions(sehirFilter, data.sehirler, currentValues.sehir);
+        }
+        if (changedFilter !== 'grup') {
+            updateFilterOptions(grupFilter, data.gruplar, currentValues.grup);
+        }
+        if (changedFilter !== 'tur') {
+            updateFilterOptions(turFilter, data.turler, currentValues.tur);
+        }
+        
+    } catch (error) {
+        console.error('Error updating filters:', error);
+    }
+}
+
+// Helper function to update filter options
+function updateFilterOptions(filterElement, options, currentValue) {
+    // Mevcut seçimi sakla
+    const previousValue = currentValue;
+    
+    // Filtreyi temizle
+    filterElement.innerHTML = '<option value="">Tümü</option>';
+    
+    // Yeni seçenekleri ekle
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        filterElement.appendChild(optionElement);
+    });
+    
+    // Eğer önceki seçim hala mevcut listede varsa, onu koru
+    if (previousValue && options.includes(previousValue)) {
+        filterElement.value = previousValue;
+    } else {
+        // Önceki seçim artık geçerli değilse "Tümü" yap
+        filterElement.value = '';
     }
 }
 
@@ -199,6 +294,7 @@ async function loadUniversities() {
             ulke: currentUlke,
             sehir: currentSehir,
             grup: currentGrup,
+            tur: currentTur,
             sort_by: currentSortBy,
             sort_order: currentSortOrder
         });
@@ -252,14 +348,20 @@ function displayUniversities(universities) {
                     </div>
                 </div>
                 <div class="row mt-2">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <i class="fas fa-book me-1"></i>
                         <strong>Program:</strong> ${uni['Program Adı']}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <i class="fas fa-chart-line me-1"></i>
                         <strong>2024 Puanı:</strong> ${uni['2024 YKS En Küçük Puanı']}
                     </div>
+                    ${uni['Tür'] ? `
+                    <div class="col-md-4">
+                        <i class="fas fa-tag me-1"></i>
+                        <strong>Tür:</strong> ${uni['Tür']}
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="row mt-2">
                     <div class="col-md-6">
@@ -319,6 +421,12 @@ async function showUniversityDetail(programKodu) {
                             <span class="detail-label">Program Adı:</span>
                             <span class="detail-value">${university['Program Adı']}</span>
                         </div>
+                        ${university['Tür'] ? `
+                        <div class="detail-item">
+                            <span class="detail-label">Tür:</span>
+                            <span class="detail-value">${university['Tür']}</span>
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="col-md-6">
                         <div class="detail-item">
@@ -354,6 +462,7 @@ function performSearch() {
     currentUlke = ulkeFilter.value;
     currentSehir = sehirFilter.value;
     currentGrup = grupFilter.value;
+    currentTur = turFilter.value;
     
     loadUniversities();
 }
@@ -364,11 +473,13 @@ function clearFilters() {
     ulkeFilter.value = '';
     sehirFilter.value = '';
     grupFilter.value = '';
+    turFilter.value = '';
     
     currentSearch = '';
     currentUlke = '';
     currentSehir = '';
     currentGrup = '';
+    currentTur = '';
     
     // Reset sort buttons
     sortButtons.forEach(btn => btn.classList.remove('active'));
@@ -376,6 +487,9 @@ function clearFilters() {
     
     currentSortBy = 'Üniversite Adı';
     currentSortOrder = 'asc';
+    
+    // Tüm filtreleri sıfırla
+    loadFilters();
     
     loadUniversities();
 }
