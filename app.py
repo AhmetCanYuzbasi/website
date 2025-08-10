@@ -56,52 +56,72 @@ def get_google_sheets_client():
         print(f"Google Sheets bağlantı hatası: {e}")
         return None
 
-# Google Sheets'ten veri yükleme
-def load_data_from_sheets():
+# Eski load_data_from_sheets fonksiyonu kaldırıldı - Artık load_data() kullanılıyor
+
+# Excel dosyasından veri yükleme fonksiyonu kaldırıldı - Artık Google Sheets kullanılıyor
+
+# Ana veri yükleme fonksiyonu
+def load_data():
+    """Ana veri yükleme fonksiyonu - Google Sheets'ten yükler"""
     try:
         client = get_google_sheets_client()
         if not client:
-            print("Google Sheets bağlantısı kurulamadı, Excel dosyası kullanılıyor...")
-            return load_data_from_excel()
+            print("❌ Google Sheets bağlantısı kurulamadı!")
+            return None
         
-        # Google Sheets ID'sini buraya ekleyin
-        # Sheets URL'sinden alabilirsiniz: https://docs.google.com/spreadsheets/d/SHEET_ID/edit
-        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')  # Environment variable'dan al
-        
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
         if not SHEET_ID:
-            print("GOOGLE_SHEET_ID environment variable'ı ayarlanmamış, Excel dosyası kullanılıyor...")
-            return load_data_from_excel()
+            print("❌ GOOGLE_SHEET_ID environment variable'ı ayarlanmamış!")
+            return None
         
-        # Sheet'i aç
-        sheet = client.open_by_key(SHEET_ID).sheet1
+        # Ana veri worksheet'ini bul (varsayılan olarak ilk worksheet)
+        spreadsheet = client.open_by_key(SHEET_ID)
+        worksheets = spreadsheet.worksheets()
         
-        # Ham veriyi al (formatlanmamış)
-        all_values = sheet.get_all_values()
+        print(f"📊 Mevcut worksheet'ler: {[ws.title for ws in worksheets]}")
+        print(f"📊 Toplam worksheet sayısı: {len(worksheets)}")
+        
+        # Ana veri worksheet'ini bul (genellikle ilk worksheet)
+        main_worksheet = None
+        for ws in worksheets:
+            print(f"🔍 Worksheet kontrol ediliyor: '{ws.title}'")
+            # Ana veri worksheet'ini tanımla
+            if ws.title.lower() in ['üniversiteler', 'universiteler', 'ana veri', 'ana_veri', 'main', 'data']:
+                main_worksheet = ws
+                print(f"✅ Ana veri worksheet bulundu: '{ws.title}'")
+                break
+        
+        # Eğer bulunamazsa ilk worksheet'i kullan
+        if not main_worksheet and len(worksheets) > 0:
+            main_worksheet = worksheets[0]  # İlk worksheet
+            print(f"⚠️ Ana veri worksheet bulunamadı, '{main_worksheet.title}' kullanılıyor")
+        
+        if not main_worksheet:
+            print("❌ Ana veri worksheet bulunamadı!")
+            return None
+        
+        print(f"🎯 Seçilen ana veri worksheet: '{main_worksheet.title}'")
+        
+        # Ham veriyi al
+        all_values = main_worksheet.get_all_values()
+        
+        print(f"📊 Worksheet'ten alınan satır sayısı: {len(all_values)}")
         
         if not all_values or len(all_values) < 2:
-            print("Google Sheets'te veri bulunamadı, Excel dosyası kullanılıyor...")
-            return load_data_from_excel()
+            print("❌ Ana veri worksheet'inde veri bulunamadı!")
+            return None
         
         # Başlıkları al
         headers = all_values[0]
+        print(f"📋 Başlıklar: {headers}")
         
         # Veri satırlarını al
         data_rows = all_values[1:]
         
         # DataFrame oluştur
         df = pd.DataFrame(data_rows, columns=headers)
-        print(f'Google Sheets\'ten {len(df)} satır veri yüklendi')
-        print('Google Sheets başlıkları:', list(df.columns))
-        
-        # Sütun yapısını kontrol et ve gerekirse düzenle
-        expected_columns = ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı']
-        
-        # Eksik sütunları kontrol et
-        missing_columns = [col for col in expected_columns if col not in df.columns]
-        if missing_columns:
-            print(f'Eksik sütunlar: {missing_columns}')
-            print('Excel dosyası kullanılıyor...')
-            return load_data_from_excel()
+        print(f'✅ Ana veri worksheet\'inden {len(df)} satır veri yüklendi')
+        print('📊 Ana veri başlıkları:', list(df.columns))
         
         # Sayısal sütunları düzelt
         numeric_columns = ['Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
@@ -124,36 +144,10 @@ def load_data_from_sheets():
         return df
         
     except Exception as e:
-        print(f'Google Sheets okuma hatası: {e}')
-        print("Excel dosyası kullanılıyor...")
-        return load_data_from_excel()
-
-# Excel dosyasından veri yükleme (fallback)
-def load_data_from_excel():
-    try:
-        # Excel dosyasını yükle (dosya adını kendi dosyanızla değiştirin)
-        df = pd.read_excel('toplantı tablo 1.xlsx')
-        print('Excel başlıkları:', list(df.columns))
-        print('İlk satır:', df.iloc[0].to_dict() if not df.empty else 'Tablo boş')
-        return df
-    except Exception as e:
-        print('Excel okuma hatası:', e)
-        # Örnek veri oluştur (gerçek verilerinizi yükleyene kadar)
-        data = {
-            'Üniversite Adı': ['İstanbul Üniversitesi', 'Ankara Üniversitesi', 'İzmir Üniversitesi'],
-            'Program Kodu': ['101110001', '101110002', '101110003'],
-            'Fakülte Adı': ['Tıp Fakültesi', 'Hukuk Fakültesi', 'Mühendislik Fakültesi'],
-            'Şehir': ['İstanbul', 'Ankara', 'İzmir'],
-            'Grup': ['MF-3', 'TM-2', 'MF-4'],
-            'Kontenjan': [100, 80, 120],
-            '2024 Başarı Sırası': [1500, 2500, 3000],
-            '2024 YKS En Küçük Puanı': [450.5, 420.3, 380.7]
-        }
-        return pd.DataFrame(data)
-
-# Ana veri yükleme fonksiyonu
-def load_data():
-    return load_data_from_sheets()
+        print(f'❌ Ana veri yükleme hatası: {e}')
+        import traceback
+        traceback.print_exc()
+        return None
 
 
 # Türkçe sıralama anahtarı
@@ -461,6 +455,360 @@ def delete_universite(program_kodu):
     except Exception as e:
         print(f'Veri silme hatası: {e}')
         return jsonify({'error': 'Veri silinirken hata oluştu'}), 500
+
+# Ders programı verilerini yükleme
+def load_ders_programi_data():
+    """Ders programı worksheet'inden veri yükler"""
+    try:
+        client = get_google_sheets_client()
+        if not client:
+            print("Google Sheets bağlantısı kurulamadı!")
+            return None
+        
+        SHEET_ID = os.environ.get('GOOGLE_SHEET_ID', '')
+        if not SHEET_ID:
+            print("GOOGLE_SHEET_ID environment variable'ı ayarlanmamış!")
+            return None
+        
+        # Ders programı worksheet'ini bul (varsayılan olarak ikinci worksheet)
+        spreadsheet = client.open_by_key(SHEET_ID)
+        
+        # Worksheet listesini al
+        worksheets = spreadsheet.worksheets()
+        
+        # Debug: Mevcut worksheet'leri listele
+        print(f"Mevcut worksheet'ler: {[ws.title for ws in worksheets]}")
+        print(f"Toplam worksheet sayısı: {len(worksheets)}")
+        
+        # Ders programı worksheet'ini bul (genellikle ikinci worksheet)
+        ders_worksheet = None
+        for ws in worksheets:
+            print(f"Worksheet kontrol ediliyor: '{ws.title}' (lower: '{ws.title.lower()}')")
+            if ws.title.lower() in ['ders programı', 'ders_programi', 'ders programi', 'ders_programı']:
+                ders_worksheet = ws
+                print(f"✅ Ders programı worksheet bulundu: '{ws.title}'")
+                break
+        
+        # Eğer bulunamazsa ikinci worksheet'i kullan
+        if not ders_worksheet and len(worksheets) > 1:
+            ders_worksheet = worksheets[1]  # İkinci worksheet
+            print(f"⚠️ Ders programı worksheet bulunamadı, {ders_worksheet.title} kullanılıyor")
+        
+        if not ders_worksheet:
+            print("❌ Ders programı worksheet bulunamadı!")
+            return None
+        
+        print(f"🎯 Seçilen worksheet: '{ders_worksheet.title}'")
+        
+        # Ham veriyi al
+        all_values = ders_worksheet.get_all_values()
+        
+        print(f"📊 Worksheet'ten alınan satır sayısı: {len(all_values)}")
+        
+        if not all_values or len(all_values) < 2:
+            print("❌ Ders programı worksheet'inde veri bulunamadı!")
+            return None
+        
+        # Başlıkları al
+        headers = all_values[0]
+        print(f"📋 Başlıklar: {headers}")
+        
+        # Veri satırlarını al
+        data_rows = all_values[1:]
+        
+        # DataFrame oluştur
+        df = pd.DataFrame(data_rows, columns=headers)
+        print(f'✅ Ders programı worksheet\'inden {len(df)} satır veri yüklendi')
+        print('📊 Ders programı başlıkları:', list(df.columns))
+        
+        return df
+        
+    except Exception as e:
+        print(f'❌ Ders programı veri yükleme hatası: {e}')
+        import traceback
+        traceback.print_exc()
+        return None
+
+# Ders programı sayfası
+@app.route('/ders-planlari')
+def ders_planlari():
+    """Ders planları sayfası"""
+    return render_template('ders_planlari.html')
+
+# Ders programı verilerini API olarak döndürme
+@app.route('/api/ders-programi')
+def get_ders_programi():
+    """Ders programı verilerini JSON olarak döndürür"""
+    try:
+        df = load_ders_programi_data()
+        
+        if df is None:
+            return jsonify({'error': 'Ders programı verisi yüklenemedi'}), 500
+        
+        # Veriyi JSON formatına çevir
+        data = []
+        for _, row in df.iterrows():
+            row_dict = {}
+            for col in df.columns:
+                value = row[col]
+                # NaN değerleri boş string olarak değiştir
+                if pd.isna(value):
+                    value = ""
+                row_dict[col] = str(value)
+            data.append(row_dict)
+        
+        return jsonify({
+            'data': data,
+            'total_count': len(data),
+            'columns': list(df.columns)
+        })
+        
+    except Exception as e:
+        print(f'Ders programı API hatası: {e}')
+        return jsonify({'error': 'Veri alınırken hata oluştu'}), 500
+
+# Ders programı filtreleri
+@app.route('/api/ders-programi-filtreler')
+def get_ders_programi_filtreler():
+    """Ders programı için filtre seçeneklerini döndürür"""
+    try:
+        df = load_ders_programi_data()
+        
+        if df is None:
+            return jsonify({'error': 'Ders programı verisi yüklenemedi'}), 500
+        
+        # Filtre seçeneklerini hazırla
+        filtreler = {}
+        
+        # Üniversite filtreleri
+        if 'ÜNİVERSİTE' in df.columns:
+            universite_list = sorted(df['ÜNİVERSİTE'].dropna().unique())
+            filtreler['universite'] = [str(u) for u in universite_list if str(u).strip()]
+        
+        # Bölüm filtreleri
+        if 'BÖLÜM' in df.columns:
+            bolum_list = sorted(df['BÖLÜM'].dropna().unique())
+            filtreler['bolum'] = [str(b) for b in bolum_list if str(b).strip()]
+        
+        # Dönem filtreleri
+        if 'DÖNEM' in df.columns:
+            donem_list = sorted(df['DÖNEM'].dropna().unique())
+            filtreler['donem'] = [str(d) for d in donem_list if str(d).strip()]
+        
+        # Ders grubu filtreleri
+        if 'DERS GRUBU' in df.columns:
+            ders_grubu_list = sorted(df['DERS GRUBU'].dropna().unique())
+            filtreler['ders_grubu'] = [str(dg) for dg in ders_grubu_list if str(dg).strip()]
+        
+        # Ders alt grubu filtreleri
+        if 'DERS ALT GRUBU' in df.columns:
+            ders_alt_grubu_list = sorted(df['DERS ALT GRUBU'].dropna().unique())
+            filtreler['ders_alt_grubu'] = [str(dag) for dag in ders_alt_grubu_list if str(dag).strip()]
+        
+        return jsonify(filtreler)
+        
+    except Exception as e:
+        print(f'Ders programı filtre hatası: {e}')
+        return jsonify({'error': 'Filtreler alınırken hata oluştu'}), 500
+
+# Filtrelenmiş ders programı verileri
+@app.route('/api/ders-programi-filtrele', methods=['POST'])
+def filter_ders_programi():
+    """Ders programı verilerini filtreler"""
+    try:
+        df = load_ders_programi_data()
+        
+        if df is None:
+            return jsonify({'error': 'Ders programı verisi yüklenemedi'}), 500
+        
+        # Filtre parametrelerini al
+        data = request.get_json()
+        universite = data.get('universite', '')
+        bolum = data.get('bolum', '')
+        donem = data.get('donem', '')
+        ders_grubu = data.get('ders_grubu', '')
+        ders_alt_grubu = data.get('ders_alt_grubu', '')
+        
+        # Debug: Log the received parameters
+        print(f"🔍 Filtre parametreleri alındı:")
+        print(f"   Üniversite: '{universite}'")
+        print(f"   Bölüm: '{bolum}'")
+        print(f"   Dönem: '{donem}'")
+        print(f"   Ders Grubu: '{ders_grubu}'")
+        print(f"   Ders Alt Grubu: '{ders_alt_grubu}'")
+        
+        # Debug: Log the data shape and sample
+        print(f"🔍 DataFrame boyutu: {df.shape}")
+        print(f"🔍 DataFrame sütunları: {list(df.columns)}")
+        if not df.empty:
+            print(f"🔍 İlk 3 satır örneği:")
+            for i, row in df.head(3).iterrows():
+                print(f"   Satır {i}: {dict(row)}")
+        
+        # Filtreleme yap
+        filtered_df = df.copy()
+        original_count = len(filtered_df)
+        
+        if universite:
+            print(f"🔍 Üniversite filtresi uygulanıyor: '{universite}'")
+            before_filter = len(filtered_df)
+            # Daha esnek arama: hem contains hem de tam eşleşme
+            universite_mask = (
+                filtered_df['ÜNİVERSİTE'].astype(str).str.contains(universite, case=False, na=False) |
+                filtered_df['ÜNİVERSİTE'].astype(str).str.lower() == universite.lower()
+            )
+            filtered_df = filtered_df[universite_mask]
+            after_filter = len(filtered_df)
+            print(f"   Üniversite filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+            
+            # Debug: Show what was found
+            if after_filter > 0:
+                print(f"   Bulunan üniversiteler: {filtered_df['ÜNİVERSİTE'].unique()}")
+            else:
+                print(f"   ❌ Hiç üniversite bulunamadı!")
+                # Check if there are similar names
+                all_universities = df['ÜNİVERSİTE'].astype(str).unique()
+                print(f"   Mevcut üniversiteler: {all_universities}")
+        
+        if bolum:
+            print(f"🔍 Bölüm filtresi uygulanıyor: '{bolum}'")
+            before_filter = len(filtered_df)
+            
+            # Bölüm filtresi için yeni mantık
+            def bolum_filter_logic(row_bolum, filter_bolum):
+                """Bölüm filtresi için özel mantık"""
+                if pd.isna(row_bolum) or pd.isna(filter_bolum):
+                    return False
+                
+                row_str = str(row_bolum).strip()
+                filter_str = str(filter_bolum).strip()
+                
+                if not row_str or not filter_str:
+                    return False
+                
+                # 1. Tam eşleşme (büyük/küçük harf duyarsız)
+                if row_str.lower() == filter_str.lower():
+                    print(f"   ✅ Tam eşleşme bulundu: '{row_str}' == '{filter_str}'")
+                    return True
+                
+                # 2. İçeriyor kontrolü (büyük/küçük harf duyarsız)
+                if filter_str.lower() in row_str.lower():
+                    print(f"   ✅ İçeriyor bulundu: '{filter_str}' in '{row_str}'")
+                    return True
+                
+                # 3. Kısmi eşleşme kontrolü (kelime bazında)
+                row_words = set(row_str.lower().split())
+                filter_words = set(filter_str.lower().split())
+                
+                # Eğer filtredeki tüm kelimeler satırda varsa
+                if filter_words.issubset(row_words):
+                    print(f"   ✅ Kelime eşleşmesi bulundu: {filter_words} ⊆ {row_words}")
+                    return True
+                
+                # 4. Özel durumlar için kontrol
+                # "Bilgisayar Mühendisliği (İngilizce)" gibi parantezli ifadeler
+                if '(' in filter_str and ')' in filter_str:
+                    # Parantez içindeki kısmı çıkar
+                    base_filter = filter_str.split('(')[0].strip()
+                    if base_filter.lower() in row_str.lower():
+                        print(f"   ✅ Parantez öncesi eşleşme: '{base_filter}' in '{row_str}'")
+                        return True
+                
+                return False
+            
+            # Filtreleme uygula
+            bolum_mask = filtered_df['BÖLÜM'].apply(
+                lambda x: bolum_filter_logic(x, bolum)
+            )
+            
+            filtered_df = filtered_df[bolum_mask]
+            after_filter = len(filtered_df)
+            
+            print(f"   Bölüm filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+            
+            # Debug: Show what was found
+            if after_filter > 0:
+                found_bolums = filtered_df['BÖLÜM'].unique()
+                print(f"   ✅ Bulunan bölümler ({len(found_bolums)} adet):")
+                for i, bol in enumerate(found_bolums, 1):
+                    print(f"      {i}. {bol}")
+            else:
+                print(f"   ❌ Hiç bölüm bulunamadı!")
+                
+                # Mevcut bölümleri kontrol et
+                if len(filtered_df) > 0:
+                    all_bolums = filtered_df['BÖLÜM'].astype(str).unique()
+                    print(f"   🔍 Mevcut bölümler ({len(all_bolums)} adet):")
+                    for i, bol in enumerate(all_bolums[:10], 1):  # İlk 10'unu göster
+                        print(f"      {i}. {bol}")
+                    if len(all_bolums) > 10:
+                        print(f"      ... ve {len(all_bolums) - 10} tane daha")
+                else:
+                    print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
+        
+        if donem:
+            print(f"🔍 Dönem filtresi uygulanıyor: '{donem}'")
+            before_filter = len(filtered_df)
+            # Daha esnek arama: hem contains hem de tam eşleşme
+            donem_mask = (
+                filtered_df['DÖNEM'].astype(str).str.contains(donem, case=False, na=False) |
+                filtered_df['DÖNEM'].astype(str).str.lower() == donem.lower()
+            )
+            filtered_df = filtered_df[donem_mask]
+            after_filter = len(filtered_df)
+            print(f"   Dönem filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+        
+        if ders_grubu:
+            print(f"🔍 Ders Grubu filtresi uygulanıyor: '{ders_grubu}'")
+            before_filter = len(filtered_df)
+            # Daha esnek arama: hem contains hem de tam eşleşme
+            ders_grubu_mask = (
+                filtered_df['DERS GRUBU'].astype(str).str.contains(ders_grubu, case=False, na=False) |
+                filtered_df['DERS GRUBU'].astype(str).str.lower() == ders_grubu.lower()
+            )
+            filtered_df = filtered_df[ders_grubu_mask]
+            after_filter = len(filtered_df)
+            print(f"   Ders Grubu filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+        
+        if ders_alt_grubu:
+            print(f"🔍 Ders Alt Grubu filtresi uygulanıyor: '{ders_alt_grubu}'")
+            before_filter = len(filtered_df)
+            # Daha esnek arama: hem contains hem de tam eşleşme
+            ders_alt_grubu_mask = (
+                filtered_df['DERS ALT GRUBU'].astype(str).str.contains(ders_alt_grubu, case=False, na=False) |
+                filtered_df['DERS ALT GRUBU'].astype(str).str.lower() == ders_alt_grubu.lower()
+            )
+            filtered_df = filtered_df[ders_alt_grubu_mask]
+            after_filter = len(filtered_df)
+            print(f"   Ders Alt Grubu filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+        
+        print(f"🔍 Filtreleme tamamlandı. Orijinal: {original_count}, Filtrelenmiş: {len(filtered_df)}")
+        
+        # Veriyi JSON formatına çevir
+        data = []
+        for _, row in filtered_df.iterrows():
+            row_dict = {}
+            for col in filtered_df.columns:
+                value = row[col]
+                if pd.isna(value):
+                    value = ""
+                row_dict[col] = str(value)
+            data.append(row_dict)
+        
+        return jsonify({
+            'data': data,
+            'total_count': len(data),
+            'filtered_count': len(filtered_df),
+            'columns': list(filtered_df.columns)
+        })
+        
+    except Exception as e:
+        print(f'❌ Ders programı filtreleme hatası: {e}')
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'Filtreleme yapılırken hata oluştu'}), 500
+
+
 
 # Veri kaynağı durumu kontrolü
 @app.route('/api/status')

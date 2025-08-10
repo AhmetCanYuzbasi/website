@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Ders Planları - BMO Bilgi Bankası</title>
+    <link rel="icon" type="image/png" href="/static/tbkLogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #0099cc;
+            --accent-color: #ff6b35;
+            --dark-bg: #0a1929;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #b0bec5;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a1929 0%, #1a2332 50%, #2d3748 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 153, 204, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-10px) translateY(-10px); }
+            50% { transform: translateX(10px) translateY(-5px); }
+            75% { transform: translateX(-5px) translateY(10px); }
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            animation: scanLine 3s ease-in-out infinite;
+        }
+
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-glow {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .company-name-glow {
+            color: var(--text-primary);
+            font-weight: bold;
+            font-size: 1.5em;
+            text-shadow: 0 0 15px var(--text-primary), 0 0 30px var(--text-primary);
+            animation: companyPulse 3s ease-in-out infinite;
+            margin-top: 15px;
+            letter-spacing: 2px;
+        }
+
+        @keyframes companyPulse {
+            0%, 100% { 
+                text-shadow: 0 0 15px var(--text-primary), 0 0 30px var(--text-primary);
+                transform: scale(1);
+            }
+            50% { 
+                text-shadow: 0 0 25px var(--text-primary), 0 0 50px var(--text-primary), 0 0 75px rgba(255, 255, 255, 0.3);
+                transform: scale(1.05);
+            }
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--accent-color), #ff8c42) !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 600 !important;
+            padding: 12px 25px !important;
+            border-radius: 50px !important;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3) !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4) !important;
+            color: white !important;
+            text-decoration: none !important;
+        }
+
+        .filter-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-card h5 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-select, .form-control {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            backdrop-filter: blur(10px);
+            cursor: pointer !important;
+            z-index: 1000 !important;
+        }
+
+        .form-select:focus, .form-control:focus {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .form-select option {
+            background: var(--dark-bg) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+            cursor: pointer !important;
+        }
+
+        /* Ensure dropdowns are clickable */
+        .form-select:hover {
+            border-color: var(--primary-color) !important;
+            cursor: pointer !important;
+        }
+
+
+        .filter-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 100;
+        }
+
+        .data-table {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .table {
+            margin-bottom: 0;
+            color: var(--text-primary) !important;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 107, 53, 0.1));
+            border-bottom: 2px solid var(--border-color);
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+            padding: 15px 10px;
+        }
+
+        .table tbody td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 10px;
+            text-align: center;
+            vertical-align: middle;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary) !important;
+        }
+
+        /* Force white text for all table content */
+        .table * {
+            color: var(--text-primary) !important;
+        }
+
+        .table tbody tr td {
+            color: white !important;
+        }
+
+        .table tbody tr td * {
+            color: white !important;
+        }
+
+        /* Additional specificity for table data */
+        .data-table .table tbody tr td {
+            color: white !important;
+        }
+
+        .data-table .table tbody tr td * {
+            color: white !important;
+        }
+
+        /* Override any Bootstrap table styles */
+        .table-striped tbody tr:nth-of-type(odd) td {
+            color: white !important;
+        }
+
+        .table-striped tbody tr:nth-of-type(even) td {
+            color: white !important;
+        }
+
+        /* Ensure all text in table cells is white */
+        .table tbody tr td,
+        .table tbody tr td span,
+        .table tbody tr td div,
+        .table tbody tr td p {
+            color: white !important;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stats-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+
+        .spinner-border {
+            color: var(--primary-color);
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .error-message {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .page-link {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            margin: 0 2px;
+            border-radius: 10px !important;
+        }
+
+        .page-link:hover {
+            background: var(--primary-color) !important;
+            color: white !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .page-item.active .page-link {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .page-item.disabled .page-link {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--text-secondary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .header-section {
+                padding: 20px;
+            }
+            
+            .filter-card {
+                padding: 20px;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="main-container">
+                    <!-- Header -->
+                    <div class="header-section">
+                        <div class="header-content text-center">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="/" class="back-btn">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Ana Sayfa
+                                </a>
+                                <h1 class="display-4 fw-bold title-glow mb-0">
+                                    <i class="fas fa-graduation-cap me-3"></i>
+                                    Ders Planları
+                                </h1>
+                                <div style="width: 120px;"></div> <!-- Spacer for centering -->
+                            </div>
+                            <p class="lead mb-0">Üniversite Ders Programları ve Müfredat Bilgileri</p>
+                            <h2 class="company-name-glow">
+                                <i class="fas fa-building me-2"></i>
+                                TBK BİLİŞİM SİSTEMLERİ
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="totalCount">-</div>
+                                <div class="stats-label">Toplam Ders</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="filteredCount">-</div>
+                                <div class="stats-label">Filtrelenmiş</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="universiteCount">-</div>
+                                <div class="stats-label">Üniversite</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-number" id="bolumCount">-</div>
+                                <div class="stats-label">Bölüm</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filter-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5><i class="fas fa-filter me-2 text-primary"></i>Filtreler</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Üniversite:</label>
+                                    <select id="universiteFilter" class="form-select">
+                                        <option value="">Tümü</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Bölüm:</label>
+                                    <select id="bolumFilter" class="form-select">
+                                        <option value="">Tümü</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Dönem:</label>
+                                    <select id="donemFilter" class="form-select">
+                                        <option value="">Tümü</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Ders Grubu:</label>
+                                    <select id="dersGrubuFilter" class="form-select">
+                                        <option value="">Tümü</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Ders Alt Grubu:</label>
+                                    <select id="dersAltGrubuFilter" class="form-select">
+                                        <option value="">Tümü</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button id="clearFilters" class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-times me-2"></i>Filtreleri Temizle
+                                </button>
+                                <button id="applyFilters" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Filtrele
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="data-table">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="dersTable">
+                                <thead>
+                                    <tr>
+                                        <th>ÜNİVERSİTE</th>
+                                        <th>FAKÜLTE</th>
+                                        <th>BÖLÜM</th>
+                                        <th>GEÇERLİLİK TARİHİ</th>
+                                        <th>DÖNEM</th>
+                                        <th>DERS KODU</th>
+                                        <th>DERS GRUBU</th>
+                                        <th>DERS ALT GRUBU</th>
+                                        <th>DERS ADI</th>
+                                        <th>T</th>
+                                        <th>U</th>
+                                        <th>L</th>
+                                        <th>Z/S</th>
+                                        <th>AKTS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dersTableBody">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Loading and Error States -->
+                    <div id="loadingState" class="loading-spinner" style="display: none;">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+
+                    <div id="errorState" class="error-message" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorText">Veri yüklenirken hata oluştu</span>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Ders programı sayfalama">
+                        <ul class="pagination" id="pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 50;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM yüklendi, filtreler kontrol ediliyor...');
+            
+            // Check if all filter elements exist
+            const universiteFilter = document.getElementById('universiteFilter');
+            const bolumFilter = document.getElementById('bolumFilter');
+            const donemFilter = document.getElementById('donemFilter');
+            const dersGrubuFilter = document.getElementById('dersGrubuFilter');
+            const dersAltGrubuFilter = document.getElementById('dersAltGrubuFilter');
+            
+            console.log('Filtre elementleri:', {
+                universiteFilter: !!universiteFilter,
+                bolumFilter: !!bolumFilter,
+                donemFilter: !!donemFilter,
+                dersGrubuFilter: !!dersGrubuFilter,
+                dersAltGrubuFilter: !!dersAltGrubuFilter
+            });
+            
+            if (universiteFilter && bolumFilter && donemFilter && dersGrubuFilter && dersAltGrubuFilter) {
+                console.log('Tüm filtre elementleri bulundu, yükleniyor...');
+                loadFilters();
+                loadData();
+            } else {
+                console.error('Bazı filtre elementleri bulunamadı!');
+            }
+        });
+
+        // Load filters
+        async function loadFilters() {
+            try {
+                const response = await fetch('/api/ders-programi-filtreler');
+                const filters = await response.json();
+                
+                if (response.ok) {
+                    populateFilter('universiteFilter', filters.universite || []);
+                    populateFilter('bolumFilter', filters.bolum || []);
+                    populateFilter('donemFilter', filters.donem || []);
+                    populateFilter('dersGrubuFilter', filters.ders_grubu || []);
+                    populateFilter('dersAltGrubuFilter', filters.ders_alt_grubu || []);
+                    console.log('Filtreler yüklendi:', { 
+                        universite: filters.universite?.length || 0,
+                        bolum: filters.bolum?.length || 0,
+                        donem: filters.donem?.length || 0,
+                        ders_grubu: filters.ders_grubu?.length || 0,
+                        ders_alt_grubu: filters.ders_alt_grubu?.length || 0
+                    });
+                } else {
+                    console.error('Filtreler yüklenemedi:', filters.error);
+                }
+            } catch (error) {
+                console.error('Filtre yükleme hatası:', error);
+            }
+        }
+
+        // Populate filter dropdown
+        function populateFilter(filterId, options) {
+            const select = document.getElementById(filterId);
+            const currentValue = select.value; // Preserve current selection
+            
+            console.log(`populateFilter: ${filterId} için ${options.length} seçenek yükleniyor`);
+            console.log(`populateFilter: ${filterId} mevcut değer:`, currentValue);
+            
+            select.innerHTML = '<option value="">Tümü</option>';
+            
+            options.forEach(option => {
+                if (option && option.trim()) {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    select.appendChild(optionElement);
+                }
+            });
+            
+            // Restore current selection if it's still valid
+            if (currentValue && options.includes(currentValue)) {
+                select.value = currentValue;
+                console.log(`populateFilter: ${filterId} için değer geri yüklendi:`, currentValue);
+            } else {
+                console.log(`populateFilter: ${filterId} için değer geri yüklenmedi, mevcut:`, currentValue, 'geçerli seçenekler:', options);
+            }
+        }
+
+        // Update dependent filters based on current selection
+        function updateDependentFilters() {
+            console.log('🔍 updateDependentFilters başlatıldı');
+            
+            // Check if data is loaded
+            if (!allData || allData.length === 0) {
+                console.log('❌ Veri henüz yüklenmedi');
+                return;
+            }
+            
+            const universite = document.getElementById('universiteFilter').value;
+            const bolum = document.getElementById('bolumFilter').value;
+            const donem = document.getElementById('donemFilter').value;
+            const dersGrubu = document.getElementById('dersGrubuFilter').value;
+            
+            console.log('📋 Mevcut filtre değerleri:', { universite, bolum, donem, dersGrubu });
+            
+            // 1. ÜNİVERSİTE filtresi uygulandıktan sonra BÖLÜM seçeneklerini güncelle
+            if (universite) {
+                console.log('🏫 Üniversite filtresi uygulanıyor:', universite);
+                
+                // Üniversiteye göre filtrelenmiş veri
+                const universiteFiltered = allData.filter(row => {
+                    const rowUni = String(row['ÜNİVERSİTE'] || '').trim();
+                    const filterUni = universite.trim();
+                    
+                    // Tam eşleşme veya içeriyor kontrolü
+                    return rowUni.toLowerCase() === filterUni.toLowerCase() || 
+                           rowUni.toLowerCase().includes(filterUni.toLowerCase());
+                });
+                
+                console.log(`🏫 Üniversite filtresi sonrası: ${universiteFiltered.length} satır`);
+                
+                // Bu üniversiteye ait bölümleri al
+                const bolumOptions = [...new Set(
+                    universiteFiltered
+                        .map(row => row['BÖLÜM'])
+                        .filter(Boolean)
+                        .map(String)
+                        .sort()
+                )];
+                
+                console.log('📚 Bulunan bölümler:', bolumOptions);
+                populateFilter('bolumFilter', bolumOptions);
+                
+                // Eğer mevcut bölüm seçimi artık geçerli değilse, temizle
+                if (bolum && !bolumOptions.includes(bolum)) {
+                    console.log('⚠️ Mevcut bölüm seçimi geçersiz, temizleniyor');
+                    document.getElementById('bolumFilter').value = '';
+                }
+                
+                // 2. BÖLÜM filtresi uygulandıktan sonra DÖNEM seçeneklerini güncelle
+                if (bolum) {
+                    console.log('📚 Bölüm filtresi uygulanıyor:', bolum);
+                    
+                    const bolumFiltered = universiteFiltered.filter(row => {
+                        const rowBolum = String(row['BÖLÜM'] || '').trim();
+                        const filterBolum = bolum.trim();
+                        
+                        // Tam eşleşme veya içeriyor kontrolü
+                        return rowBolum.toLowerCase() === filterBolum.toLowerCase() || 
+                               rowBolum.toLowerCase().includes(filterBolum.toLowerCase());
+                    });
+                    
+                    console.log(`📚 Bölüm filtresi sonrası: ${bolumFiltered.length} satır`);
+                    
+                    // Bu bölüme ait dönemleri al
+                    const donemOptions = [...new Set(
+                        bolumFiltered
+                            .map(row => row['DÖNEM'])
+                            .filter(Boolean)
+                            .map(String)
+                            .sort()
+                    )];
+                    
+                    console.log('📅 Bulunan dönemler:', donemOptions);
+                    populateFilter('donemFilter', donemOptions);
+                    
+                    // Eğer mevcut dönem seçimi artık geçerli değilse, temizle
+                    if (donem && !donemOptions.includes(donem)) {
+                        console.log('⚠️ Mevcut dönem seçimi geçersiz, temizleniyor');
+                        document.getElementById('donemFilter').value = '';
+                    }
+                    
+                    // 3. DÖNEM filtresi uygulandıktan sonra DERS GRUBU seçeneklerini güncelle
+                    if (donem) {
+                        console.log('📅 Dönem filtresi uygulanıyor:', donem);
+                        
+                        const donemFiltered = bolumFiltered.filter(row => {
+                            const rowDonem = String(row['DÖNEM'] || '').trim();
+                            const filterDonem = donem.trim();
+                            
+                            return rowDonem.toLowerCase() === filterDonem.toLowerCase() || 
+                                   rowDonem.toLowerCase().includes(filterDonem.toLowerCase());
+                        });
+                        
+                        console.log(`📅 Dönem filtresi sonrası: ${donemFiltered.length} satır`);
+                        
+                        // Bu döneme ait ders gruplarını al
+                        const dersGrubuOptions = [...new Set(
+                            donemFiltered
+                                .map(row => row['DERS GRUBU'])
+                                .filter(Boolean)
+                                .map(String)
+                                .sort()
+                        )];
+                        
+                        console.log('📖 Bulunan ders grupları:', dersGrubuOptions);
+                        populateFilter('dersGrubuFilter', dersGrubuOptions);
+                        
+                        // Eğer mevcut ders grubu seçimi artık geçerli değilse, temizle
+                        if (dersGrubu && !dersGrubuOptions.includes(dersGrubu)) {
+                            console.log('⚠️ Mevcut ders grubu seçimi geçersiz, temizleniyor');
+                            document.getElementById('dersGrubuFilter').value = '';
+                        }
+                        
+                        // 4. DERS GRUBU filtresi uygulandıktan sonra DERS ALT GRUBU seçeneklerini güncelle
+                        if (dersGrubu) {
+                            console.log('📖 Ders Grubu filtresi uygulanıyor:', dersGrubu);
+                            
+                            const dersGrubuFiltered = donemFiltered.filter(row => {
+                                const rowDersGrubu = String(row['DERS GRUBU'] || '').trim();
+                                const filterDersGrubu = dersGrubu.trim();
+                                
+                                return rowDersGrubu.toLowerCase() === filterDersGrubu.toLowerCase() || 
+                                       rowDersGrubu.toLowerCase().includes(filterDersGrubu.toLowerCase());
+                            });
+                            
+                            console.log(`📖 Ders Grubu filtresi sonrası: ${dersGrubuFiltered.length} satır`);
+                            
+                            // Bu ders grubuna ait alt grupları al
+                            const dersAltGrubuOptions = [...new Set(
+                                dersGrubuFiltered
+                                    .map(row => row['DERS ALT GRUBU'])
+                                    .filter(Boolean)
+                                    .map(String)
+                                    .sort()
+                            )];
+                            
+                            console.log('📝 Bulunan ders alt grupları:', dersAltGrubuOptions);
+                            populateFilter('dersAltGrubuFilter', dersAltGrubuOptions);
+                        } else {
+                            // Ders grubu seçilmemişse, tüm alt grupları göster
+                            const allDersAltGrubuOptions = [...new Set(
+                                donemFiltered
+                                    .map(row => row['DERS ALT GRUBU'])
+                                    .filter(Boolean)
+                                    .map(String)
+                                    .sort()
+                            )];
+                            populateFilter('dersAltGrubuFilter', allDersAltGrubuOptions);
+                        }
+                    } else {
+                        // Dönem seçilmemişse, tüm ders gruplarını ve alt gruplarını göster
+                        const allDersGrubuOptions = [...new Set(
+                            bolumFiltered
+                                .map(row => row['DERS GRUBU'])
+                                .filter(Boolean)
+                                .map(String)
+                                .sort()
+                        )];
+                        populateFilter('dersGrubuFilter', allDersGrubuOptions);
+                        
+                        const allDersAltGrubuOptions = [...new Set(
+                            bolumFiltered
+                                .map(row => row['DERS ALT GRUBU'])
+                                .filter(Boolean)
+                                .map(String)
+                                .sort()
+                        )];
+                        populateFilter('dersAltGrubuFilter', allDersAltGrubuOptions);
+                    }
+                } else {
+                    // Bölüm seçilmemişse, tüm dönem, ders grubu ve alt gruplarını göster
+                    const allDonemOptions = [...new Set(
+                        universiteFiltered
+                            .map(row => row['DÖNEM'])
+                            .filter(Boolean)
+                            .map(String)
+                            .sort()
+                    )];
+                    populateFilter('donemFilter', allDonemOptions);
+                    
+                    const allDersGrubuOptions = [...new Set(
+                        universiteFiltered
+                            .map(row => row['DERS GRUBU'])
+                            .filter(Boolean)
+                            .map(String)
+                            .sort()
+                    )];
+                    populateFilter('dersGrubuFilter', allDersGrubuOptions);
+                    
+                    const allDersAltGrubuOptions = [...new Set(
+                        universiteFiltered
+                            .map(row => row['DERS ALT GRUBU'])
+                            .filter(Boolean)
+                            .map(String)
+                            .sort()
+                    )];
+                    populateFilter('dersAltGrubuFilter', allDersAltGrubuOptions);
+                }
+            } else {
+                // Üniversite seçilmemişse, tüm seçenekleri göster
+                console.log('🏫 Üniversite seçilmemiş, tüm seçenekler gösteriliyor');
+                
+                const allBolumOptions = [...new Set(
+                    allData
+                        .map(row => row['BÖLÜM'])
+                        .filter(Boolean)
+                        .map(String)
+                        .sort()
+                )];
+                populateFilter('bolumFilter', allBolumOptions);
+                
+                const allDonemOptions = [...new Set(
+                    allData
+                        .map(row => row['DÖNEM'])
+                        .filter(Boolean)
+                        .map(String)
+                        .sort()
+                )];
+                populateFilter('donemFilter', allDonemOptions);
+                
+                const allDersGrubuOptions = [...new Set(
+                    allData
+                        .map(row => row['DERS GRUBU'])
+                        .filter(Boolean)
+                        .map(String)
+                        .sort()
+                )];
+                populateFilter('dersGrubuFilter', allDersGrubuOptions);
+                
+                const allDersAltGrubuOptions = [...new Set(
+                    allData
+                        .map(row => row['DERS ALT GRUBU'])
+                        .filter(Boolean)
+                        .map(String)
+                        .sort()
+                )];
+                populateFilter('dersAltGrubuFilter', allDersAltGrubuOptions);
+            }
+            
+            console.log('✅ updateDependentFilters tamamlandı');
+        }
+
+
+
+
+
+        // Load data
+        async function loadData() {
+            showLoading(true);
+            hideError();
+            
+            try {
+                const response = await fetch('/api/ders-programi');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    allData = result.data;
+                    filteredData = [...allData];
+                    updateStats();
+                    displayData();
+                    // Update dependent filters after data is loaded
+                    updateDependentFilters();
+                    
+
+                } else {
+                    showError(result.error || 'Veri yüklenemedi');
+                }
+            } catch (error) {
+                showError('Veri yüklenirken hata oluştu: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Apply filters
+        async function applyFilters() {
+            const universite = document.getElementById('universiteFilter').value;
+            const bolum = document.getElementById('bolumFilter').value;
+            const donem = document.getElementById('donemFilter').value;
+            const dersGrubu = document.getElementById('dersGrubuFilter').value;
+            const dersAltGrubu = document.getElementById('dersAltGrubuFilter').value;
+            
+
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/api/ders-programi-filtrele', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        universite,
+                        bolum,
+                        donem,
+                        ders_grubu: dersGrubu,
+                        ders_alt_grubu: dersAltGrubu
+                    })
+                });
+                
+                const result = await response.json();
+                
+
+                
+                if (response.ok) {
+                    filteredData = result.data;
+                    currentPage = 1;
+                    updateStats();
+                    displayData();
+                    
+
+                } else {
+                    showError(result.error || 'Filtreleme yapılamadı');
+                }
+            } catch (error) {
+                showError('Filtreleme yapılırken hata oluştu: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Display data
+        function displayData() {
+            const tbody = document.getElementById('dersTableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            tbody.innerHTML = '';
+            
+            pageData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row['ÜNİVERSİTE'] || ''}</td>
+                    <td>${row['FAKÜLTE'] || ''}</td>
+                    <td>${row['BÖLÜM'] || ''}</td>
+                    <td>${row['GEÇERLİLİK TARİHİ'] || ''}</td>
+                    <td>${row['DÖNEM'] || ''}</td>
+                    <td>${row['DERS KODU'] || ''}</td>
+                    <td>${row['DERS GRUBU'] || ''}</td>
+                    <td>${row['DERS ALT GRUBU'] || ''}</td>
+                    <td>${row['DERS ADI'] || ''}</td>
+                    <td>${row['T'] || ''}</td>
+                    <td>${row['U'] || ''}</td>
+                    <td>${row['L'] || ''}</td>
+                    <td>${row['Z/S'] || ''}</td>
+                    <td>${row['AKTS'] || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            updatePagination();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allData.length.toLocaleString();
+            document.getElementById('filteredCount').textContent = filteredData.length.toLocaleString();
+            
+            const uniqueUniversite = new Set(allData.map(row => row['ÜNİVERSİTE']).filter(Boolean));
+            const uniqueBolum = new Set(allData.map(row => row['BÖLÜM']).filter(Boolean));
+            
+            document.getElementById('universiteCount').textContent = uniqueUniversite.size.toLocaleString();
+            document.getElementById('bolumCount').textContent = uniqueBolum.size.toLocaleString();
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            pagination.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Previous button
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `
+                <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            `;
+            pagination.appendChild(prevLi);
+            
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+                pagination.appendChild(li);
+            }
+            
+            // Next button
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `
+                <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            `;
+            pagination.appendChild(nextLi);
+        }
+
+        // Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                displayData();
+            }
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('universiteFilter').value = '';
+            document.getElementById('bolumFilter').value = '';
+            document.getElementById('donemFilter').value = '';
+            document.getElementById('dersGrubuFilter').value = '';
+            document.getElementById('dersAltGrubuFilter').value = '';
+            
+            filteredData = [...allData];
+            currentPage = 1;
+            updateStats();
+            displayData();
+            // Update dependent filters after clearing
+            updateDependentFilters();
+        }
+
+        // Show/hide loading
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+        }
+
+        // Show/hide error
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorState').style.display = 'none';
+        }
+
+        // Event listeners
+        document.getElementById('applyFilters').addEventListener('click', applyFilters);
+        document.getElementById('clearFilters').addEventListener('click', clearFilters);
+        
+        // Add change event listeners for dependent filters
+        document.getElementById('universiteFilter').addEventListener('change', function() {
+            console.log('Üniversite değişti:', this.value);
+            // Reset dependent filters when university changes
+            document.getElementById('bolumFilter').value = '';
+            document.getElementById('donemFilter').value = '';
+            document.getElementById('dersGrubuFilter').value = '';
+            document.getElementById('dersAltGrubuFilter').value = '';
+            updateDependentFilters();
+        });
+        
+        document.getElementById('bolumFilter').addEventListener('change', function() {
+            console.log('Bölüm değişti:', this.value);
+            // Reset dependent filters when department changes
+            document.getElementById('donemFilter').value = '';
+            document.getElementById('dersGrubuFilter').value = '';
+            document.getElementById('dersAltGrubuFilter').value = '';
+            updateDependentFilters();
+        });
+        
+        document.getElementById('donemFilter').addEventListener('change', function() {
+            console.log('Dönem değişti:', this.value);
+            // Reset dependent filters when semester changes
+            document.getElementById('dersGrubuFilter').value = '';
+            document.getElementById('dersAltGrubuFilter').value = '';
+            updateDependentFilters();
+        });
+        
+        document.getElementById('dersGrubuFilter').addEventListener('change', function() {
+            console.log('Ders Grubu değişti:', this.value);
+            // Reset dependent filter when course group changes
+            document.getElementById('dersAltGrubuFilter').value = '';
+            updateDependentFilters();
+        });
+        
+        document.getElementById('dersAltGrubuFilter').addEventListener('change', function() {
+            console.log('Ders Alt Grubu değişti:', this.value);
+        });
+        
+        // Add click event listeners to test if dropdowns are clickable
+        document.getElementById('universiteFilter').addEventListener('click', function() {
+            console.log('Üniversite dropdown tıklandı');
+        });
+        
+        document.getElementById('bolumFilter').addEventListener('click', function() {
+            console.log('Bölüm dropdown tıklandı');
+        });
+        
+        document.getElementById('donemFilter').addEventListener('click', function() {
+            console.log('Dönem dropdown tıklandı');
+        });
+        
+        document.getElementById('dersGrubuFilter').addEventListener('click', function() {
+            console.log('Ders Grubu dropdown tıklandı');
+        });
+        
+        document.getElementById('dersAltGrubuFilter').addEventListener('click', function() {
+            console.log('Ders Alt Grubu dropdown tıklandı');
+        });
+    </script>
+</body>
+</html>

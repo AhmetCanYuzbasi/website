@@ -395,55 +395,106 @@ async function showUniversityDetail(programKodu) {
             document.getElementById('detaylarBtn').href = `/detay/${university['Program Kodu']}`;
             
             document.getElementById('modalBody').innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <span class="detail-label">Program Kodu:</span>
-                            <span class="detail-value">${university['Program Kodu']}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Fakülte Adı:</span>
-                            <span class="detail-value">${university['Fakülte Adı']}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Ülke:</span>
-                            <span class="detail-value">${university['Ülke'] || 'Türkiye'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Şehir:</span>
-                            <span class="detail-value">${university['Şehir']}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Grup:</span>
-                            <span class="detail-value">${university['Grup']}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Program Adı:</span>
-                            <span class="detail-value">${university['Program Adı']}</span>
-                        </div>
-                        ${university['Tür'] ? `
-                        <div class="detail-item">
-                            <span class="detail-label">Tür:</span>
-                            <span class="detail-value">${university['Tür']}</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <span class="detail-label">Kontenjan:</span>
-                            <span class="detail-value">${university['Kontenjan']}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">2024 Başarı Sırası:</span>
-                            <span class="detail-value">${university['2024 Başarı Sırası']}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">2024 YKS En Küçük Puanı:</span>
-                            <span class="detail-value">${university['2024 YKS En Küçük Puanı']}</span>
+                <!-- Ana Bilgiler Kartı -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                            <h6 style="color: var(--primary-color); margin-bottom: 20px; font-weight: bold;">
+                                <i class="fas fa-info-circle me-2"></i>Temel Bilgiler
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-code me-2"></i>Program Kodu</div>
+                                        <div class="detail-value">${university['Program Kodu'] || '-'}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-graduation-cap me-2"></i>Fakülte</div>
+                                        <div class="detail-value">${university['Fakülte Adı'] || '-'}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-book me-2"></i>Program Adı</div>
+                                        <div class="detail-value">${university['Program Adı'] || '-'}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-layer-group me-2"></i>Grup</div>
+                                        <div class="detail-value">${university['Grup'] || '-'}</div>
+                                    </div>
+                                </div>
+                                ${university['Tür'] ? `
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-tag me-2"></i>Üniversite Türü</div>
+                                        <div class="detail-value">${university['Tür']}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Konum Bilgileri -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                            <h6 style="color: var(--accent-color); margin-bottom: 20px; font-weight: bold;">
+                                <i class="fas fa-map-marker-alt me-2"></i>Konum Bilgileri
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-globe me-2"></i>Ülke</div>
+                                        <div class="detail-value">${university['Ülke'] || 'Türkiye'}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="detail-item">
+                                        <div class="detail-label"><i class="fas fa-city me-2"></i>Şehir</div>
+                                        <div class="detail-value">${university['Şehir'] || '-'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İstatistikler -->
+                <div class="row">
+                    <div class="col-12">
+                        <div style="background: linear-gradient(135deg, rgba(0, 153, 204, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color);">
+                            <h6 style="color: var(--secondary-color); margin-bottom: 20px; font-weight: bold;">
+                                <i class="fas fa-chart-line me-2"></i>2024 YKS İstatistikleri
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="detail-item" style="text-align: center; background: rgba(0, 212, 255, 0.1);">
+                                        <div class="detail-label" style="font-size: 0.9em;"><i class="fas fa-users me-2"></i>Kontenjan</div>
+                                        <div class="detail-value" style="font-size: 1.5em; font-weight: bold; color: var(--primary-color);">${university['Kontenjan'] || '-'}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item" style="text-align: center; background: rgba(255, 107, 53, 0.1);">
+                                        <div class="detail-label" style="font-size: 0.9em;"><i class="fas fa-trophy me-2"></i>Başarı Sırası</div>
+                                        <div class="detail-value" style="font-size: 1.5em; font-weight: bold; color: var(--accent-color);">${university['2024 Başarı Sırası'] || '-'}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item" style="text-align: center; background: rgba(0, 153, 204, 0.1);">
+                                        <div class="detail-label" style="font-size: 0.9em;"><i class="fas fa-chart-bar me-2"></i>En Küçük Puan</div>
+                                        <div class="detail-value" style="font-size: 1.5em; font-weight: bold; color: var(--secondary-color);">${university['2024 YKS En Küçük Puanı'] || '-'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
             
             detailModal.show();
