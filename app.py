@@ -652,23 +652,77 @@ def filter_ders_programi():
         if universite:
             print(f"🔍 Üniversite filtresi uygulanıyor: '{universite}'")
             before_filter = len(filtered_df)
-            # Daha esnek arama: hem contains hem de tam eşleşme
-            universite_mask = (
-                filtered_df['ÜNİVERSİTE'].astype(str).str.contains(universite, case=False, na=False) |
-                filtered_df['ÜNİVERSİTE'].astype(str).str.lower() == universite.lower()
+            
+            # Üniversite filtresi için esnek mantık
+            def universite_filter_logic(row_universite, filter_universite):
+                """Üniversite filtresi için özel mantık"""
+                if pd.isna(row_universite) or pd.isna(filter_universite):
+                    return False
+                
+                row_str = str(row_universite).strip()
+                filter_str = str(filter_universite).strip()
+                
+                if not row_str or not filter_str:
+                    return False
+                
+                # 1. Tam eşleşme (büyük/küçük harf duyarsız)
+                if row_str.lower() == filter_str.lower():
+                    print(f"   ✅ Tam eşleşme bulundu: '{row_str}' == '{filter_str}'")
+                    return True
+                
+                # 2. İçeriyor kontrolü (büyük/küçük harf duyarsız)
+                if filter_str.lower() in row_str.lower():
+                    print(f"   ✅ İçeriyor bulundu: '{filter_str}' in '{row_str}'")
+                    return True
+                
+                # 3. Kısmi eşleşme kontrolü (kelime bazında)
+                row_words = set(row_str.lower().split())
+                filter_words = set(filter_str.lower().split())
+                
+                # Eğer filtredeki tüm kelimeler satırda varsa
+                if filter_words.issubset(row_words):
+                    print(f"   ✅ Kelime eşleşmesi bulundu: {filter_words} ⊆ {row_words}")
+                    return True
+                
+                # 4. Özel durumlar için kontrol
+                # "İstanbul Üniversitesi" gibi parantezli ifadeler
+                if '(' in filter_str and ')' in filter_str:
+                    # Parantez içindeki kısmı çıkar
+                    base_filter = filter_str.split('(')[0].strip()
+                    if base_filter.lower() in row_str.lower():
+                        print(f"   ✅ Parantez öncesi eşleşme: '{base_filter}' in '{row_str}'")
+                        return True
+                
+                return False
+            
+            # Filtreleme uygula
+            universite_mask = filtered_df['ÜNİVERSİTE'].apply(
+                lambda x: universite_filter_logic(x, universite)
             )
+            
             filtered_df = filtered_df[universite_mask]
             after_filter = len(filtered_df)
             print(f"   Üniversite filtresi öncesi: {before_filter}, sonrası: {after_filter}")
             
             # Debug: Show what was found
             if after_filter > 0:
-                print(f"   Bulunan üniversiteler: {filtered_df['ÜNİVERSİTE'].unique()}")
+                found_universities = filtered_df['ÜNİVERSİTE'].unique()
+                print(f"   ✅ Bulunan üniversiteler ({len(found_universities)} adet):")
+                for i, uni in enumerate(found_universities, 1):
+                    print(f"      {i}. {uni}")
             else:
                 print(f"   ❌ Hiç üniversite bulunamadı!")
-                # Check if there are similar names
-                all_universities = df['ÜNİVERSİTE'].astype(str).unique()
-                print(f"   Mevcut üniversiteler: {all_universities}")
+                
+                # Mevcut üniversiteleri kontrol et
+                if len(filtered_df) > 0:
+                    all_universities = filtered_df['ÜNİVERSİTE'].astype(str).unique()
+                    print(f"   🔍 Mevcut üniversiteler ({len(all_universities)} adet):")
+                    for i, uni in enumerate(all_universities[:10], 1):  # İlk 10'unu göster
+                        print(f"      {i}. {uni}")
+                    if len(all_universities) > 10:
+                        print(f"      ... ve {len(all_universities) - 10} tane daha")
+                else:
+                    print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
         
         if bolum:
             print(f"🔍 Bölüm filtresi uygulanıyor: '{bolum}'")
@@ -749,38 +803,217 @@ def filter_ders_programi():
         if donem:
             print(f"🔍 Dönem filtresi uygulanıyor: '{donem}'")
             before_filter = len(filtered_df)
-            # Daha esnek arama: hem contains hem de tam eşleşme
-            donem_mask = (
-                filtered_df['DÖNEM'].astype(str).str.contains(donem, case=False, na=False) |
-                filtered_df['DÖNEM'].astype(str).str.lower() == donem.lower()
+            
+            # Dönem filtresi için esnek mantık
+            def donem_filter_logic(row_donem, filter_donem):
+                """Dönem filtresi için özel mantık"""
+                if pd.isna(row_donem) or pd.isna(filter_donem):
+                    return False
+                
+                row_str = str(row_donem).strip()
+                filter_str = str(filter_donem).strip()
+                
+                if not row_str or not filter_str:
+                    return False
+                
+                # 1. Tam eşleşme (büyük/küçük harf duyarsız)
+                if row_str.lower() == filter_str.lower():
+                    print(f"   ✅ Tam eşleşme bulundu: '{row_str}' == '{filter_str}'")
+                    return True
+                
+                # 2. İçeriyor kontrolü (büyük/küçük harf duyarsız)
+                if filter_str.lower() in row_str.lower():
+                    print(f"   ✅ İçeriyor bulundu: '{filter_str}' in '{row_str}'")
+                    return True
+                
+                # 3. Sayısal eşleşme kontrolü (1, 2, 3 vs.)
+                try:
+                    if row_str.isdigit() and filter_str.isdigit():
+                        if int(row_str) == int(filter_str):
+                            print(f"   ✅ Sayısal eşleşme bulundu: {row_str} == {filter_str}")
+                            return True
+                except:
+                    pass
+                
+                return False
+            
+            # Filtreleme uygula
+            donem_mask = filtered_df['DÖNEM'].apply(
+                lambda x: donem_filter_logic(x, donem)
             )
+            
             filtered_df = filtered_df[donem_mask]
             after_filter = len(filtered_df)
             print(f"   Dönem filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+            
+            # Debug: Show what was found
+            if after_filter > 0:
+                found_donems = filtered_df['DÖNEM'].unique()
+                print(f"   ✅ Bulunan dönemler ({len(found_donems)} adet):")
+                for i, don in enumerate(found_donems, 1):
+                    print(f"      {i}. {don}")
+            else:
+                print(f"   ❌ Hiç dönem bulunamadı!")
+                
+                # Mevcut dönemleri kontrol et
+                if len(filtered_df) > 0:
+                    all_donems = filtered_df['DÖNEM'].astype(str).unique()
+                    print(f"   🔍 Mevcut dönemler ({len(all_donems)} adet):")
+                    for i, don in enumerate(all_donems[:10], 1):  # İlk 10'unu göster
+                        print(f"      {i}. {don}")
+                    if len(all_donems) > 10:
+                        print(f"      ... ve {len(all_donems) - 10} tane daha")
+                else:
+                    print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
         
         if ders_grubu:
             print(f"🔍 Ders Grubu filtresi uygulanıyor: '{ders_grubu}'")
             before_filter = len(filtered_df)
-            # Daha esnek arama: hem contains hem de tam eşleşme
-            ders_grubu_mask = (
-                filtered_df['DERS GRUBU'].astype(str).str.contains(ders_grubu, case=False, na=False) |
-                filtered_df['DERS GRUBU'].astype(str).str.lower() == ders_grubu.lower()
+            
+            # Ders Grubu filtresi için esnek mantık
+            def ders_grubu_filter_logic(row_ders_grubu, filter_ders_grubu):
+                """Ders Grubu filtresi için özel mantık"""
+                if pd.isna(row_ders_grubu) or pd.isna(filter_ders_grubu):
+                    return False
+                
+                row_str = str(row_ders_grubu).strip()
+                filter_str = str(filter_ders_grubu).strip()
+                
+                if not row_str or not filter_str:
+                    return False
+                
+                # 1. Tam eşleşme (büyük/küçük harf duyarsız)
+                if row_str.lower() == filter_str.lower():
+                    print(f"   ✅ Tam eşleşme bulundu: '{row_str}' == '{filter_str}'")
+                    return True
+                
+                # 2. İçeriyor kontrolü (büyük/küçük harf duyarsız)
+                if filter_str.lower() in row_str.lower():
+                    print(f"   ✅ İçeriyor bulundu: '{filter_str}' in '{row_str}'")
+                    return True
+                
+                # 3. Kısmi eşleşme kontrolü (kelime bazında)
+                row_words = set(row_str.lower().split())
+                filter_words = set(filter_str.lower().split())
+                
+                # Eğer filtredeki tüm kelimeler satırda varsa
+                if filter_words.issubset(row_words):
+                    print(f"   ✅ Kelime eşleşmesi bulundu: {filter_words} ⊆ {row_words}")
+                    return True
+                
+                # 4. Kısaltma kontrolü (MATEMATİK -> MAT)
+                if len(filter_str) >= 3:
+                    if filter_str.lower() in row_str.lower()[:len(filter_str)]:
+                        print(f"   ✅ Kısaltma eşleşmesi bulundu: '{filter_str}' in '{row_str}'")
+                        return True
+                
+                return False
+            
+            # Filtreleme uygula
+            ders_grubu_mask = filtered_df['DERS GRUBU'].apply(
+                lambda x: ders_grubu_filter_logic(x, ders_grubu)
             )
+            
             filtered_df = filtered_df[ders_grubu_mask]
             after_filter = len(filtered_df)
             print(f"   Ders Grubu filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+            
+            # Debug: Show what was found
+            if after_filter > 0:
+                found_ders_gruplari = filtered_df['DERS GRUBU'].unique()
+                print(f"   ✅ Bulunan ders grupları ({len(found_ders_gruplari)} adet):")
+                for i, dg in enumerate(found_ders_gruplari, 1):
+                    print(f"      {i}. {dg}")
+            else:
+                print(f"   ❌ Hiç ders grubu bulunamadı!")
+                
+                # Mevcut ders gruplarını kontrol et
+                if len(filtered_df) > 0:
+                    all_ders_gruplari = filtered_df['DERS GRUBU'].astype(str).unique()
+                    print(f"   🔍 Mevcut ders grupları ({len(all_ders_gruplari)} adet):")
+                    for i, dg in enumerate(all_ders_gruplari[:10], 1):  # İlk 10'unu göster
+                        print(f"      {i}. {dg}")
+                    if len(all_ders_gruplari) > 10:
+                        print(f"      ... ve {len(all_ders_gruplari) - 10} tane daha")
+                else:
+                    print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
         
         if ders_alt_grubu:
             print(f"🔍 Ders Alt Grubu filtresi uygulanıyor: '{ders_alt_grubu}'")
             before_filter = len(filtered_df)
-            # Daha esnek arama: hem contains hem de tam eşleşme
-            ders_alt_grubu_mask = (
-                filtered_df['DERS ALT GRUBU'].astype(str).str.contains(ders_alt_grubu, case=False, na=False) |
-                filtered_df['DERS ALT GRUBU'].astype(str).str.lower() == ders_alt_grubu.lower()
+            
+            # Ders Alt Grubu filtresi için esnek mantık
+            def ders_alt_grubu_filter_logic(row_ders_alt_grubu, filter_ders_alt_grubu):
+                """Ders Alt Grubu filtresi için özel mantık"""
+                if pd.isna(row_ders_alt_grubu) or pd.isna(filter_ders_alt_grubu):
+                    return False
+                
+                row_str = str(row_ders_alt_grubu).strip()
+                filter_str = str(filter_ders_alt_grubu).strip()
+                
+                if not row_str or not filter_str:
+                    return False
+                
+                # 1. Tam eşleşme (büyük/küçük harf duyarsız)
+                if row_str.lower() == filter_str.lower():
+                    print(f"   ✅ Tam eşleşme bulundu: '{row_str}' == '{filter_str}'")
+                    return True
+                
+                # 2. İçeriyor kontrolü (büyük/küçük harf duyarsız)
+                if filter_str.lower() in row_str.lower():
+                    print(f"   ✅ İçeriyor bulundu: '{filter_str}' in '{row_str}'")
+                    return True
+                
+                # 3. Kısmi eşleşme kontrolü (kelime bazında)
+                row_words = set(row_str.lower().split())
+                filter_words = set(filter_str.lower().split())
+                
+                # Eğer filtredeki tüm kelimeler satırda varsa
+                if filter_words.issubset(row_words):
+                    print(f"   ✅ Kelime eşleşmesi bulundu: {filter_words} ⊆ {row_words}")
+                    return True
+                
+                # 4. Kısaltma kontrolü (WebProgramlama -> Web)
+                if len(filter_str) >= 3:
+                    if filter_str.lower() in row_str.lower()[:len(filter_str)]:
+                        print(f"   ✅ Kısaltma eşleşmesi bulundu: '{filter_str}' in '{row_str}'")
+                        return True
+                
+                # 5. Boş değer kontrolü (eğer filtre boşsa, boş olanları da kabul et)
+                if not filter_str and not row_str:
+                    print(f"   ✅ Boş değer eşleşmesi bulundu")
+                    return True
+                
+                return False
+            
+            # Filtreleme uygula
+            ders_alt_grubu_mask = filtered_df['DERS ALT GRUBU'].apply(
+                lambda x: ders_alt_grubu_filter_logic(x, ders_alt_grubu)
             )
+            
             filtered_df = filtered_df[ders_alt_grubu_mask]
             after_filter = len(filtered_df)
             print(f"   Ders Alt Grubu filtresi öncesi: {before_filter}, sonrası: {after_filter}")
+            
+            # Debug: Show what was found
+            if after_filter > 0:
+                found_ders_alt_gruplari = filtered_df['DERS ALT GRUBU'].unique()
+                print(f"   ✅ Bulunan ders alt grupları ({len(found_ders_alt_gruplari)} adet):")
+                for i, dag in enumerate(found_ders_alt_gruplari, 1):
+                    print(f"      {i}. {dag}")
+            else:
+                print(f"   ❌ Hiç ders alt grubu bulunamadı!")
+                
+                # Mevcut ders alt gruplarını kontrol et
+                if len(filtered_df) > 0:
+                    all_ders_alt_gruplari = filtered_df['DERS ALT GRUBU'].astype(str).unique()
+                    print(f"   🔍 Mevcut ders alt grupları ({len(all_ders_alt_gruplari)} adet):")
+                    for i, dag in enumerate(all_ders_alt_gruplari[:10], 1):  # İlk 10'unu göster
+                        print(f"      {i}. {dag}")
+                    if len(all_ders_alt_gruplari) > 10:
+                        print(f"      ... ve {len(all_ders_alt_gruplari) - 10} tane daha")
+                else:
+                    print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
         
         print(f"🔍 Filtreleme tamamlandı. Orijinal: {original_count}, Filtrelenmiş: {len(filtered_df)}")
         
