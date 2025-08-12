@@ -18,11 +18,13 @@ const turFilter = document.getElementById('turFilter');
 const clearFiltersBtn = document.getElementById('clearFilters');
 const resultsContainer = document.getElementById('resultsContainer');
 const sortButtons = document.querySelectorAll('.sort-btn');
-const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
 const dataSourceStatus = document.getElementById('dataSourceStatus');
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // URL'den filtreleri geri yükle
+    restoreFiltersFromURL();
+    
     checkDataSourceStatus();
     loadFilters();
     loadUniversities();
@@ -62,7 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (currentSortBy === sortBy) {
                 // Aynı butona tekrar basıldıysa yönü ters çevir
-                currentSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+                currentSortBy = sortBy;
+                currentSortOrder = (currentSortBy === sortBy && currentSortOrder === 'asc') ? 'desc' : 'asc';
             } else {
                 // Farklı butona basıldıysa varsayılan yönü kullan
                 currentSortBy = sortBy;
@@ -73,6 +76,9 @@ document.addEventListener('DOMContentLoaded', function() {
             sortButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
+            // URL'yi güncelle
+            updateURL();
+            
             performSearch();
         });
     });
@@ -81,12 +87,75 @@ document.addEventListener('DOMContentLoaded', function() {
     createAutocomplete();
 });
 
+// URL'den filtreleri geri yükle
+function restoreFiltersFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('search')) {
+        currentSearch = urlParams.get('search');
+        searchInput.value = currentSearch;
+    }
+    
+    if (urlParams.has('ulke')) {
+        currentUlke = urlParams.get('ulke');
+    }
+    
+    if (urlParams.has('sehir')) {
+        currentSehir = urlParams.get('sehir');
+    }
+    
+    if (urlParams.has('grup')) {
+        currentGrup = urlParams.get('grup');
+    }
+    
+    if (urlParams.has('tur')) {
+        currentTur = urlParams.get('tur');
+    }
+    
+    if (urlParams.has('sort_by')) {
+        currentSortBy = urlParams.get('sort_by');
+    }
+    
+    if (urlParams.has('sort_order')) {
+        currentSortOrder = urlParams.get('sort_order');
+    }
+    
+    // Sıralama butonlarını güncelle
+    updateSortButtons();
+}
+
+// URL'yi güncelle
+function updateURL() {
+    const urlParams = new URLSearchParams();
+    
+    if (currentSearch) urlParams.set('search', currentSearch);
+    if (currentUlke) urlParams.set('ulke', currentUlke);
+    if (currentSehir) urlParams.set('sehir', currentSehir);
+    if (currentGrup) urlParams.set('grup', currentGrup);
+    if (currentTur) urlParams.set('tur', currentTur);
+    if (currentSortBy) urlParams.set('sort_by', currentSortBy);
+    if (currentSortOrder) urlParams.set('sort_order', currentSortOrder);
+    
+    const newURL = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+    window.history.replaceState({}, '', newURL);
+}
+
+// Sıralama butonlarını güncelle
+function updateSortButtons() {
+    sortButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.sort === currentSortBy) {
+            btn.classList.add('active');
+        }
+    });
+}
+
 function createAutocomplete() {
     autocompleteList = document.createElement('div');
     autocompleteList.setAttribute('id', 'autocomplete-list');
     autocompleteList.setAttribute('class', 'autocomplete-items list-group position-absolute w-100');
     autocompleteList.style.zIndex = 1000;
-    searchInput.closest('.input-group').appendChild(autocompleteList);
+    searchInput.closest('.search-section').appendChild(autocompleteList);
 
     searchInput.addEventListener('input', async function() {
         const val = this.value.trim();
@@ -111,7 +180,8 @@ function createAutocomplete() {
                     searchInput.value = uni['Üniversite Adı'];
                     autocompleteList.innerHTML = '';
                     autocompleteList.style.display = 'none';
-                    showUniversityDetail(uni['Program Kodu']);
+                    // Direkt detay sayfasına git
+                    window.location.href = `/detay/${uni['Program Kodu']}`;
                 };
                 autocompleteList.appendChild(item);
             });
@@ -209,6 +279,13 @@ async function loadFilters() {
                 turFilter.appendChild(option);
             });
         }
+        
+        // URL'den geri yüklenen değerleri seç
+        if (currentUlke) ulkeFilter.value = currentUlke;
+        if (currentSehir) sehirFilter.value = currentSehir;
+        if (currentGrup) grupFilter.value = currentGrup;
+        if (currentTur) turFilter.value = currentTur;
+        
     } catch (error) {
         console.error('Error loading filters:', error);
     }
@@ -303,6 +380,7 @@ async function loadUniversities() {
         const universities = await response.json();
         console.log('Gelen üniversite sayısı:', universities.length, universities);
         displayUniversities(universities);
+        updateStats(universities);
     } catch (error) {
         console.error('Error loading universities:', error);
         showError('Üniversiteler yüklenirken bir hata oluştu.');
@@ -323,7 +401,7 @@ function displayUniversities(universities) {
     }
     
     const html = universities.map(uni => `
-        <div class="university-card" onclick="showUniversityDetail('${uni['Program Kodu']}')">
+        <div class="university-card" onclick="goToUniversityDetail('${uni['Program Kodu']}')">
             <div class="university-name">
                 <i class="fas fa-university me-2 text-primary"></i>
                 ${uni['Üniversite Adı']}
@@ -380,131 +458,23 @@ function displayUniversities(universities) {
     resultsContainer.innerHTML = html;
 }
 
-// Show university details in modal
-async function showUniversityDetail(programKodu) {
-    try {
-        const response = await fetch(`/api/universite/${programKodu}`);
-        const university = await response.json();
-        
-        if (response.ok) {
-            document.getElementById('modalTitle').innerHTML = `
-                <i class="fas fa-university me-2"></i>${university['Üniversite Adı']}
-            `;
-            
-            // Detaylar butonunu güncelle
-            document.getElementById('detaylarBtn').href = `/detay/${university['Program Kodu']}`;
-            
-            document.getElementById('modalBody').innerHTML = `
-                <!-- Ana Bilgiler Kartı -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                            <h6 style="color: var(--primary-color); margin-bottom: 20px; font-weight: bold;">
-                                <i class="fas fa-info-circle me-2"></i>Temel Bilgiler
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-code me-2"></i>Program Kodu</div>
-                                        <div class="detail-value">${university['Program Kodu'] || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-graduation-cap me-2"></i>Fakülte</div>
-                                        <div class="detail-value">${university['Fakülte Adı'] || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-book me-2"></i>Program Adı</div>
-                                        <div class="detail-value">${university['Program Adı'] || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-layer-group me-2"></i>Grup</div>
-                                        <div class="detail-value">${university['Grup'] || '-'}</div>
-                                    </div>
-                                </div>
-                                ${university['Tür'] ? `
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-tag me-2"></i>Üniversite Türü</div>
-                                        <div class="detail-value">${university['Tür']}</div>
-                                    </div>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Konum Bilgileri -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                            <h6 style="color: var(--accent-color); margin-bottom: 20px; font-weight: bold;">
-                                <i class="fas fa-map-marker-alt me-2"></i>Konum Bilgileri
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-globe me-2"></i>Ülke</div>
-                                        <div class="detail-value">${university['Ülke'] || 'Türkiye'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label"><i class="fas fa-city me-2"></i>Şehir</div>
-                                        <div class="detail-value">${university['Şehir'] || '-'}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- İstatistikler -->
-                <div class="row">
-                    <div class="col-12">
-                        <div style="background: linear-gradient(135deg, rgba(0, 153, 204, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%); border-radius: 20px; padding: 25px; border: 1px solid var(--border-color);">
-                            <h6 style="color: var(--secondary-color); margin-bottom: 20px; font-weight: bold;">
-                                <i class="fas fa-chart-line me-2"></i>2024 YKS İstatistikleri
-                            </h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="detail-item" style="text-align: center; background: rgba(0, 212, 255, 0.1);">
-                                        <div class="detail-label" style="font-size: 0.9em;"><i class="fas fa-users me-2"></i>Kontenjan</div>
-                                        <div class="detail-value" style="font-size: 1.5em; font-weight: bold; color: var(--primary-color);">${university['Kontenjan'] || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-item" style="text-align: center; background: rgba(255, 107, 53, 0.1);">
-                                        <div class="detail-label" style="font-size: 0.9em;"><i class="fas fa-trophy me-2"></i>Başarı Sırası</div>
-                                        <div class="detail-value" style="font-size: 1.5em; font-weight: bold; color: var(--accent-color);">${university['2024 Başarı Sırası'] || '-'}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-item" style="text-align: center; background: rgba(0, 153, 204, 0.1);">
-                                        <div class="detail-label" style="font-size: 0.9em;"><i class="fas fa-chart-bar me-2"></i>En Küçük Puan</div>
-                                        <div class="detail-value" style="font-size: 1.5em; font-weight: bold; color: var(--secondary-color);">${university['2024 YKS En Küçük Puanı'] || '-'}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            detailModal.show();
-        } else {
-            showError('Üniversite detayları yüklenirken bir hata oluştu.');
-        }
-    } catch (error) {
-        console.error('Error loading university details:', error);
-        showError('Üniversite detayları yüklenirken bir hata oluştu.');
-    }
+// Direkt detay sayfasına git
+function goToUniversityDetail(programKodu) {
+    // Mevcut filtreleri URL'ye ekle
+    const urlParams = new URLSearchParams();
+    
+    if (currentSearch) urlParams.set('search', currentSearch);
+    if (currentUlke) urlParams.set('ulke', currentUlke);
+    if (currentSehir) urlParams.set('sehir', currentSehir);
+    if (currentGrup) urlParams.set('grup', currentGrup);
+    if (currentTur) urlParams.set('tur', currentTur);
+    if (currentSortBy) urlParams.set('sort_by', currentSortBy);
+    if (currentSortOrder) urlParams.set('sort_order', currentSortOrder);
+    
+    const returnURL = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+    
+    // Detay sayfasına git ve geri dönüş URL'sini ekle
+    window.location.href = `/detay/${programKodu}?return=${encodeURIComponent(returnURL)}`;
 }
 
 // Perform search with current filters
@@ -514,6 +484,9 @@ function performSearch() {
     currentSehir = sehirFilter.value;
     currentGrup = grupFilter.value;
     currentTur = turFilter.value;
+    
+    // URL'yi güncelle
+    updateURL();
     
     loadUniversities();
 }
@@ -539,10 +512,24 @@ function clearFilters() {
     currentSortBy = 'Üniversite Adı';
     currentSortOrder = 'asc';
     
+    // URL'yi temizle
+    updateURL();
+    
     // Tüm filtreleri sıfırla
     loadFilters();
     
     loadUniversities();
+}
+
+// Update statistics
+function updateStats(universities) {
+    const uniqueUlkeler = [...new Set(universities.map(u => u['Ülke']).filter(Boolean))];
+    const uniqueSehirler = [...new Set(universities.map(u => u['Şehir']).filter(Boolean))];
+    
+    document.getElementById('totalCount').textContent = universities.length;
+    document.getElementById('ulkeCount').textContent = uniqueUlkeler.length;
+    document.getElementById('sehirCount').textContent = uniqueSehirler.length;
+    document.getElementById('filteredCount').textContent = universities.length;
 }
 
 // Show loading state
