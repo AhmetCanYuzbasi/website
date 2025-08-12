@@ -20,8 +20,14 @@ try:
 except locale.Error:
     locale.setlocale(locale.LC_COLLATE, '')  # Sistem varsayılanına geç
 
-app = Flask(__name__)
-CORS(app, origins=['https://www.bilisimizcileri.com', 'http://localhost:3000'])
+CORS(app, 
+     origins=['https://www.bilisimizcileri.com', 
+              'http://localhost:3000',
+              'https://bilisimizcileri.com',
+              'http://bilisimizcileri.com'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+     allow_headers=['Content-Type', 'Authorization'],
+     supports_credentials=True)
 
 # Google Sheets API ayarları
 SCOPES = [
