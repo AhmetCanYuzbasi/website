@@ -8,6 +8,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
 import json
+from flask_cors import CORS
+
+
+
 
 import locale
 
@@ -17,6 +21,7 @@ except locale.Error:
     locale.setlocale(locale.LC_COLLATE, '')  # Sistem varsayılanına geç
 
 app = Flask(__name__)
+CORS(app, origins=['https://www.bilisimizcileri.com', 'http://localhost:3000'])
 
 # Google Sheets API ayarları
 SCOPES = [
