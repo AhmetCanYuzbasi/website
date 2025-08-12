@@ -68,10 +68,6 @@ def get_google_sheets_client():
         print(f"Google Sheets bağlantı hatası: {e}")
         return None
 
-# Eski load_data_from_sheets fonksiyonu kaldırıldı - Artık load_data() kullanılıyor
-
-# Excel dosyasından veri yükleme fonksiyonu kaldırıldı - Artık Google Sheets kullanılıyor
-
 # Ana veri yükleme fonksiyonu
 def load_data():
     """Ana veri yükleme fonksiyonu - Google Sheets'ten yükler"""
@@ -117,7 +113,7 @@ def load_data():
         # Ham veriyi al
         all_values = main_worksheet.get_all_values()
         
-        print(f"📊 Worksheet'ten alınan satır sayısı: {len(all_values)}")
+        print(f"�� Worksheet'ten alınan satır sayısı: {len(all_values)}")
         
         if not all_values or len(all_values) < 2:
             print("❌ Ana veri worksheet'inde veri bulunamadı!")
@@ -161,7 +157,6 @@ def load_data():
         traceback.print_exc()
         return None
 
-
 # Türkçe sıralama anahtarı
 TURKISH_ALPHABET = 'a b c ç d e f g ğ h ı i j k l m n o ö p r s ş t u ü v y z'.split()
 TURKISH_ORDER = {char: idx for idx, char in enumerate(TURKISH_ALPHABET)}
@@ -176,8 +171,6 @@ def index():
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
-
-
 
 @app.route('/api/universiteler')
 def get_universiteler():
@@ -510,12 +503,12 @@ def load_ders_programi_data():
             print("❌ Ders programı worksheet bulunamadı!")
             return None
         
-        print(f"🎯 Seçilen worksheet: '{ders_worksheet.title}'")
+        print(f"�� Seçilen worksheet: '{ders_worksheet.title}'")
         
         # Ham veriyi al
         all_values = ders_worksheet.get_all_values()
         
-        print(f"📊 Worksheet'ten alınan satır sayısı: {len(all_values)}")
+        print(f"�� Worksheet'ten alınan satır sayısı: {len(all_values)}")
         
         if not all_values or len(all_values) < 2:
             print("❌ Ders programı worksheet'inde veri bulunamadı!")
@@ -548,8 +541,8 @@ def ders_planlari():
     return render_template('ders_planlari.html')
 
 # Ders programı verilerini API olarak döndürme
-@app.route('/api/ders-programi')
-def get_ders_programi():
+@app.route('/api/ders_programlari')
+def get_ders_programlari():
     """Ders programı verilerini JSON olarak döndürür"""
     try:
         df = load_ders_programi_data()
@@ -653,7 +646,7 @@ def filter_ders_programi():
         print(f"🔍 DataFrame boyutu: {df.shape}")
         print(f"🔍 DataFrame sütunları: {list(df.columns)}")
         if not df.empty:
-            print(f"🔍 İlk 3 satır örneği:")
+            print(f"�� İlk 3 satır örneği:")
             for i, row in df.head(3).iterrows():
                 print(f"   Satır {i}: {dict(row)}")
         
@@ -737,7 +730,7 @@ def filter_ders_programi():
                     print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
         
         if bolum:
-            print(f"🔍 Bölüm filtresi uygulanıyor: '{bolum}'")
+            print(f"�� Bölüm filtresi uygulanıyor: '{bolum}'")
             before_filter = len(filtered_df)
             
             # Bölüm filtresi için yeni mantık
@@ -804,7 +797,7 @@ def filter_ders_programi():
                 # Mevcut bölümleri kontrol et
                 if len(filtered_df) > 0:
                     all_bolums = filtered_df['BÖLÜM'].astype(str).unique()
-                    print(f"   🔍 Mevcut bölümler ({len(all_bolums)} adet):")
+                    print(f"   �� Mevcut bölümler ({len(all_bolums)} adet):")
                     for i, bol in enumerate(all_bolums[:10], 1):  # İlk 10'unu göster
                         print(f"      {i}. {bol}")
                     if len(all_bolums) > 10:
@@ -813,7 +806,7 @@ def filter_ders_programi():
                     print(f"   ⚠️ Filtrelenecek veri kalmadı (önceki filtreler çok kısıtlayıcı)")
         
         if donem:
-            print(f"🔍 Dönem filtresi uygulanıyor: '{donem}'")
+            print(f"�� Dönem filtresi uygulanıyor: '{donem}'")
             before_filter = len(filtered_df)
             
             # Dönem filtresi için esnek mantık
@@ -870,7 +863,7 @@ def filter_ders_programi():
                 # Mevcut dönemleri kontrol et
                 if len(filtered_df) > 0:
                     all_donems = filtered_df['DÖNEM'].astype(str).unique()
-                    print(f"   🔍 Mevcut dönemler ({len(all_donems)} adet):")
+                    print(f"   �� Mevcut dönemler ({len(all_donems)} adet):")
                     for i, don in enumerate(all_donems[:10], 1):  # İlk 10'unu göster
                         print(f"      {i}. {don}")
                     if len(all_donems) > 10:
@@ -922,6 +915,7 @@ def filter_ders_programi():
                 return False
             
             # Filtreleme uygula
+                        # Filtreleme uygula
             ders_grubu_mask = filtered_df['DERS GRUBU'].apply(
                 lambda x: ders_grubu_filter_logic(x, ders_grubu)
             )
@@ -1053,8 +1047,6 @@ def filter_ders_programi():
         traceback.print_exc()
         return jsonify({'error': 'Filtreleme yapılırken hata oluştu'}), 500
 
-
-
 # Veri kaynağı durumu kontrolü
 @app.route('/api/status')
 def get_status():
@@ -1084,12 +1076,6 @@ def get_status():
             'data_source': 'Error'
         }), 500
 
-#if __name__ == '__main__':
-#    app.run(debug=True) 
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
-
-    
-    
