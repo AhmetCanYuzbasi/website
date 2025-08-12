@@ -147,11 +147,17 @@ def load_data():
                     # Diğer sayılar için virgülü kaldır (tam sayı)
                     df[col] = df[col].astype(str).str.replace(',', '').str.replace(' ', '')
                 
-                # Sayısal değerlere çevir
+                # Sayısal değerlere çevir ve NaN'leri temizle
                 df[col] = pd.to_numeric(df[col], errors='coerce')
+                
+                # NaN değerleri None ile değiştir
+                df[col] = df[col].where(pd.notnull(df[col]), None)
                 
                 print(f'✅ {col} sütunu düzeltildi')
                 print(f'   Örnek değerler: {df[col].head().tolist()}')
+        
+        # Tüm DataFrame'deki NaN değerleri None ile değiştir
+        df = df.where(pd.notnull(df), None)
         
         return df
         
@@ -181,150 +187,226 @@ def index():
 
 @app.route('/api/universiteler')
 def get_universiteler():
-    df = load_data()
-    print('Toplam üniversite:', len(df))
-    print(df[['Üniversite Adı', 'Şehir', 'Grup']].head(10))
-    
-    # Filtreleme parametreleri
-    search = request.args.get('search', '').lower()
-    ulke = request.args.get('ulke', '')
-    sehir = request.args.get('sehir', '')
-    grup = request.args.get('grup', '')
-    tur = request.args.get('tur', '')
-    sort_by = request.args.get('sort_by', 'Üniversite Adı')
-    sort_order = request.args.get('sort_order', 'asc')
-    
-    # Sıralama öncesi: sayısal sütunları dönüştür
-    for col in ['2024 YKS En Küçük Puanı', '2024 Başarı Sırası', 'Kontenjan']:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+    try:
+        df = load_data()
+        if df is None:
+            return jsonify({'error': 'Veri yüklenemedi'}), 500
+            
+        print('Toplam üniversite:', len(df))
+        print(df[['Üniversite Adı', 'Şehir', 'Grup']].head(10))
+        
+        # Filtreleme parametreleri
+        search = request.args.get('search', '').lower()
+        ulke = request.args.get('ulke', '')
+        sehir = request.args.get('sehir', '')
+        grup = request.args.get('grup', '')
+        tur = request.args.get('tur', '')
+        sort_by = request.args.get('sort_by', 'Üniversite Adı')
+        sort_order = request.args.get('sort_order', 'asc')
+        
+        # Sıralama öncesi: sayısal sütunları dönüştür
+        for col in ['2024 YKS En Küçük Puanı', '2024 Başarı Sırası', 'Kontenjan']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+                # NaN değerleri None ile değiştir
+                df[col] = df[col].where(pd.notnull(df[col]), None)
 
-    # Arama filtresi (normalize)
-    def normalize(s):
-        if pd.isna(s):
-            return ''
-        s = str(s).strip().lower()
-        s = unicodedata.normalize('NFKD', s)
-        s = ''.join([c for c in s if not unicodedata.combining(c)])
-        return s
+        # Arama filtresi (normalize)
+        def normalize(s):
+            if pd.isna(s):
+                return ''
+            s = str(s).strip().lower()
+            s = unicodedata.normalize('NFKD', s)
+            s = ''.join([c for c in s if not unicodedata.combining(c)])
+            return s
 
-    if search:
-        search_norm = normalize(search)
-        df = df[df['Üniversite Adı'].apply(normalize).str.contains(search_norm)]
-    
-    # Ülke filtresi
-    if ulke:
-        df = df[df['Ülke'] == ulke]
-    
-    # Şehir filtresi
-    if sehir:
-        df = df[df['Şehir'] == sehir]
-    
-    # Grup filtresi
-    if grup:
-        df = df[df['Grup'] == grup]
-    
-    # Tür filtresi
-    if tur and 'Tür' in df.columns:
-        df = df[df['Tür'] == tur]
-    
-    # Sıralama
-    if sort_by in df.columns:
-        if sort_by == 'Üniversite Adı':
-            df = df.sort_values(by=sort_by, key=lambda col: col.map(turkish_key), ascending=(sort_order != 'desc'))
+        if search:
+            search_norm = normalize(search)
+            df = df[df['Üniversite Adı'].apply(normalize).str.contains(search_norm)]
+        
+        # Ülke filtresi
+        if ulke:
+            df = df[df['Ülke'] == ulke]
+        
+        # Şehir filtresi
+        if sehir:
+            df = df[df['Şehir'] == sehir]
+        
+        # Grup filtresi
+        if grup:
+            df = df[df['Grup'] == grup]
+        
+        # Tür filtresi
+        if tur and 'Tür' in df.columns:
+            df = df[df['Tür'] == tur]
+        
+        # Sıralama
+        if sort_by in df.columns:
+            if sort_by == 'Üniversite Adı':
+                df = df.sort_values(by=sort_by, key=lambda col: col.map(turkish_key), ascending=(sort_order != 'desc'))
+            else:
+                df = df.sort_values(by=sort_by, ascending=(sort_order != 'desc'))
         else:
-            df = df.sort_values(by=sort_by, ascending=(sort_order != 'desc'))
-    else:
-        df = df.sort_values(by='Üniversite Adı', key=lambda col: col.map(turkish_key))
+            df = df.sort_values(by='Üniversite Adı', key=lambda col: col.map(turkish_key))
 
-    df = df.replace({np.nan: None})  # Tüm NaN'leri None yap
-    return jsonify(df.to_dict('records'))
+        # Tüm NaN değerleri None ile değiştir
+        df = df.where(pd.notnull(df), None)
+        
+        # DataFrame'i JSON'a çevir
+        result = df.to_dict('records')
+        
+        # Son kontrol: None değerleri kontrol et
+        for record in result:
+            for key, value in record.items():
+                if pd.isna(value) or (isinstance(value, (int, float)) and value != value):
+                    record[key] = None
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f'Üniversiteler hatası: {e}')
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'Üniversiteler alınırken hata oluştu'}), 500
 
 @app.route('/api/filtreler')
 def get_filtreler():
-    df = load_data()
-    
-    ulkeler = sorted(df['Ülke'].unique().tolist())
-    sehirler = sorted(df['Şehir'].unique().tolist())
-    gruplar = sorted(df['Grup'].unique().tolist())
-    
-    # Tür sütunu varsa ekle
-    turler = []
-    if 'Tür' in df.columns:
-        turler = sorted(df['Tür'].unique().tolist())
-    
-    return jsonify({
-        'ulkeler': ulkeler,
-        'sehirler': sehirler,
-        'gruplar': gruplar,
-        'turler': turler
-    })
+    try:
+        df = load_data()
+        if df is None:
+            return jsonify({'error': 'Veri yüklenemedi'}), 500
+        
+        # NaN değerleri temizle
+        df = df.where(pd.notnull(df), None)
+        
+        ulkeler = sorted([str(u) for u in df['Ülke'].unique() if u is not None])
+        sehirler = sorted([str(s) for s in df['Şehir'].unique() if s is not None])
+        gruplar = sorted([str(g) for g in df['Grup'].unique() if g is not None])
+        
+        # Tür sütunu varsa ekle
+        turler = []
+        if 'Tür' in df.columns:
+            turler = sorted([str(t) for t in df['Tür'].unique() if t is not None])
+        
+        return jsonify({
+            'ulkeler': ulkeler,
+            'sehirler': sehirler,
+            'gruplar': gruplar,
+            'turler': turler
+        })
+    except Exception as e:
+        print(f'Filtreler hatası: {e}')
+        return jsonify({'error': 'Filtreler alınırken hata oluştu'}), 500
 
 @app.route('/api/sehirler')
 def get_sehirler():
-    df = load_data()
-    ulke = request.args.get('ulke', '')
-    
-    if ulke:
-        # Belirli ülkeye göre şehirler
-        filtered_df = df[df['Ülke'] == ulke]
-        sehirler = sorted(filtered_df['Şehir'].unique().tolist())
-    else:
-        # Tüm şehirler
-        sehirler = sorted(df['Şehir'].unique().tolist())
-    
-    return jsonify({
-        'sehirler': sehirler
-    })
+    try:
+        df = load_data()
+        if df is None:
+            return jsonify({'error': 'Veri yüklenemedi'}), 500
+            
+        ulke = request.args.get('ulke', '')
+        
+        # NaN değerleri temizle
+        df = df.where(pd.notnull(df), None)
+        
+        if ulke:
+            # Belirli ülkeye göre şehirler
+            filtered_df = df[df['Ülke'] == ulke]
+            sehirler = sorted([str(s) for s in filtered_df['Şehir'].unique() if s is not None])
+        else:
+            # Tüm şehirler
+            sehirler = sorted([str(s) for s in df['Şehir'].unique() if s is not None])
+        
+        return jsonify({
+            'sehirler': sehirler
+        })
+    except Exception as e:
+        print(f'Şehirler hatası: {e}')
+        return jsonify({'error': 'Şehirler alınırken hata oluştu'}), 500
 
 @app.route('/api/dinamik-filtreler')
 def get_dinamik_filtreler():
-    df = load_data()
-    
-    # Mevcut filtreleri al
-    ulke = request.args.get('ulke', '')
-    sehir = request.args.get('sehir', '')
-    grup = request.args.get('grup', '')
-    tur = request.args.get('tur', '')
-    
-    # DataFrame'i mevcut filtrelere göre filtrele
-    filtered_df = df.copy()
-    
-    if ulke:
-        filtered_df = filtered_df[filtered_df['Ülke'] == ulke]
-    if sehir:
-        filtered_df = filtered_df[filtered_df['Şehir'] == sehir]
-    if grup:
-        filtered_df = filtered_df[filtered_df['Grup'] == grup]
-    if tur and 'Tür' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['Tür'] == tur]
-    
-    # Filtrelenmiş veriye göre seçenekleri döndür
-    result = {
-        'ulkeler': sorted(df['Ülke'].unique().tolist()),  # Ülkeler her zaman tam liste
-        'sehirler': sorted(filtered_df['Şehir'].unique().tolist()),
-        'gruplar': sorted(filtered_df['Grup'].unique().tolist()),
-    }
-    
-    # Tür sütunu varsa ekle
-    if 'Tür' in filtered_df.columns:
-        result['turler'] = sorted(filtered_df['Tür'].unique().tolist())
-    else:
-        result['turler'] = []
-    
-    return jsonify(result)
+    try:
+        df = load_data()
+        if df is None:
+            return jsonify({'error': 'Veri yüklenemedi'}), 500
+        
+        # NaN değerleri temizle
+        df = df.where(pd.notnull(df), None)
+        
+        # Mevcut filtreleri al
+        ulke = request.args.get('ulke', '')
+        sehir = request.args.get('sehir', '')
+        grup = request.args.get('grup', '')
+        tur = request.args.get('tur', '')
+        
+        # DataFrame'i mevcut filtrelere göre filtrele
+        filtered_df = df.copy()
+        
+        if ulke:
+            filtered_df = filtered_df[filtered_df['Ülke'] == ulke]
+        if sehir:
+            filtered_df = filtered_df[filtered_df['Şehir'] == sehir]
+        if grup:
+            filtered_df = filtered_df[filtered_df['Grup'] == grup]
+        if tur and 'Tür' in filtered_df.columns:
+            filtered_df = filtered_df[filtered_df['Tür'] == tur]
+        
+        # Filtrelenmiş veriye göre seçenekleri döndür
+        result = {
+            'ulkeler': sorted([str(u) for u in df['Ülke'].unique() if u is not None]),  # Ülkeler her zaman tam liste
+            'sehirler': sorted([str(s) for s in filtered_df['Şehir'].unique() if s is not None]),
+            'gruplar': sorted([str(g) for g in filtered_df['Grup'].unique() if g is not None]),
+        }
+        
+        # Tür sütunu varsa ekle
+        if 'Tür' in filtered_df.columns:
+            result['turler'] = sorted([str(t) for t in filtered_df['Tür'].unique() if t is not None])
+        else:
+            result['turler'] = []
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f'Dinamik filtreler hatası: {e}')
+        return jsonify({'error': 'Dinamik filtreler alınırken hata oluştu'}), 500
 
 @app.route('/api/universite/<program_kodu>')
 def get_universite_detay(program_kodu):
-    df = load_data()
-    # Program Kodu'nu string olarak karşılaştır, boşlukları kırp
-    universite = df[df['Program Kodu'].astype(str).str.strip() == str(program_kodu).strip()]
+    try:
+        df = load_data()
+        if df is None:
+            return jsonify({'error': 'Veri yüklenemedi'}), 500
+            
+        # Program Kodu'nu string olarak karşılaştır, boşlukları kırp
+        universite = df[df['Program Kodu'].astype(str).str.strip() == str(program_kodu).strip()]
 
-    if universite.empty:
-        return jsonify({'error': 'Üniversite bulunamadı'}), 404
+        if universite.empty:
+            return jsonify({'error': 'Üniversite bulunamadı'}), 404
 
-    universite = universite.where(pd.notnull(universite), None)
-    return jsonify(universite.iloc[0].to_dict())
+        # NaN değerleri güvenli bir şekilde temizle
+        universite_data = universite.iloc[0].to_dict()
+        
+        # Tüm değerleri güvenli hale getir
+        cleaned_data = {}
+        for key, value in universite_data.items():
+            if pd.isna(value):
+                cleaned_data[key] = None
+            elif isinstance(value, (int, float)) and (pd.isna(value) or value != value):  # NaN kontrolü
+                cleaned_data[key] = None
+            elif isinstance(value, str):
+                # Boş string kontrolü
+                cleaned_data[key] = value.strip() if value.strip() else None
+            else:
+                cleaned_data[key] = value
+        
+        return jsonify(cleaned_data)
+        
+    except Exception as e:
+        print(f'Üniversite detay hatası: {e}')
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'Üniversite detayları alınırken hata oluştu'}), 500
 
 @app.route('/detay/<program_kodu>')
 def detay_sayfasi(program_kodu):
