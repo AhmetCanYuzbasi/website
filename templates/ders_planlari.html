@@ -429,6 +429,74 @@
             color: var(--text-primary);
         }
 
+        .column-control-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .column-control-panel h6 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .column-toggles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .column-toggles .form-check {
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .column-toggles .form-check:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .column-toggles .form-check-input {
+            margin-right: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-color);
+        }
+
+        .column-toggles .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .column-toggles .form-check-input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.25);
+        }
+
+        .column-toggles .form-check-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .btn-group-sm .btn {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            border-radius: 8px;
+        }
+
+        .btn-group-sm .btn:hover {
+            transform: translateY(-1px);
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 margin: 10px;
@@ -445,6 +513,42 @@
             
             .table-responsive {
                 font-size: 0.9rem;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filter-card .col-md-3 {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            .filter-card .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .title-glow {
+                font-size: 2em;
+            }
+            
+            .company-name-glow {
+                font-size: 1.2em;
+            }
+
+            .column-toggles {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .column-control-panel .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .column-control-panel .btn-group .btn {
+                margin-bottom: 5px;
             }
         }
     </style>
@@ -520,6 +624,27 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Column Control Panel -->
+                    <div class="column-control-panel mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">
+                                <i class="fas fa-columns me-2 text-primary"></i>
+                                Sütun Kontrolü
+                            </h6>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary" id="showAllColumns">
+                                    <i class="fas fa-eye me-1"></i>Tümünü Göster
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="hideAllColumns">
+                                    <i class="fas fa-eye-slash me-1"></i>Tümünü Gizle
+                                </button>
+                            </div>
+                        </div>
+                        <div class="column-toggles" id="columnToggles">
+                            <!-- Column toggles will be generated here -->
                         </div>
                     </div>
 
@@ -642,6 +767,8 @@
         let currentPage = 1;
         const itemsPerPage = 50;
         let searchTerm = '';
+        let visibleColumns = new Set(); // Görünür sütunları takip et
+        let allColumns = []; // Tüm sütunları sakla
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -681,6 +808,10 @@
                 searchTerm = '';
                 applySearchAndFilters();
             });
+
+            // Sütun kontrol event listener'ları
+            document.getElementById('showAllColumns').addEventListener('click', showAllColumns);
+            document.getElementById('hideAllColumns').addEventListener('click', hideAllColumns);
         });
 
         // Load filters
@@ -1024,6 +1155,12 @@
                 if (result.data && Array.isArray(result.data)) {
                     allData = result.data;
                     filteredData = [...allData];
+                    
+                    // Sütun toggle'larını oluştur
+                    if (result.columns && result.columns.length > 0) {
+                        createColumnToggles(result.columns);
+                    }
+                    
                     applySearchAndFilters();
                     // Update dependent filters after data is loaded
                     updateDependentFilters();
@@ -1117,15 +1254,14 @@
             if (searchTerm.trim()) {
                 const searchLower = searchTerm.toLowerCase();
                 finalData = finalData.filter(row => {
-                    return (
-                        (row['ÜNİVERSİTE'] && row['ÜNİVERSİTE'].toLowerCase().includes(searchLower)) ||
-                        (row['FAKÜLTE'] && row['FAKÜLTE'].toLowerCase().includes(searchLower)) ||
-                        (row['BÖLÜM'] && row['BÖLÜM'].toLowerCase().includes(searchLower)) ||
-                        (row['DERS ADI'] && row['DERS ADI'].toLowerCase().includes(searchLower)) ||
-                        (row['DERS KODU'] && row['DERS KODU'].toLowerCase().includes(searchLower)) ||
-                        (row['DERS GRUBU'] && row['DERS GRUBU'].toLowerCase().includes(searchLower)) ||
-                        (row['DERS ALT GRUBU'] && row['DERS ALT GRUBU'].toLowerCase().includes(searchLower))
-                    );
+                    // Sadece görünür sütunlarda arama yap
+                    for (const column of visibleColumns) {
+                        const value = row[column];
+                        if (value && value.toString().toLowerCase().includes(searchLower)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 });
             }
             
@@ -1133,6 +1269,98 @@
             currentPage = 1;
             updateStats();
             displayData(finalData);
+        }
+
+        // Sütun toggle'larını oluştur
+        function createColumnToggles(columns) {
+            allColumns = columns;
+            const togglesContainer = document.getElementById('columnToggles');
+            togglesContainer.innerHTML = '';
+            
+            // Varsayılan olarak tüm sütunları görünür yap
+            visibleColumns = new Set(columns);
+            
+            columns.forEach((column, index) => {
+                const toggleDiv = document.createElement('div');
+                toggleDiv.className = 'form-check';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input';
+                checkbox.id = `toggle_${index}`;
+                checkbox.checked = true;
+                checkbox.addEventListener('change', function() {
+                    toggleColumn(column, this.checked);
+                });
+                
+                const label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.htmlFor = `toggle_${index}`;
+                label.textContent = column;
+                
+                toggleDiv.appendChild(checkbox);
+                toggleDiv.appendChild(label);
+                togglesContainer.appendChild(toggleDiv);
+            });
+        }
+
+        // Sütunu gizle/göster
+        function toggleColumn(columnName, show) {
+            if (show) {
+                visibleColumns.add(columnName);
+            } else {
+                visibleColumns.delete(columnName);
+            }
+            
+            // Tablo başlıklarını güncelle
+            updateTableHeaders();
+            
+            // Tablo verilerini güncelle
+            applySearchAndFilters();
+        }
+
+        // Tablo başlıklarını güncelle
+        function updateTableHeaders() {
+            const thead = document.querySelector('#dersTable thead tr');
+            if (!thead) return;
+            
+            thead.innerHTML = '';
+            
+            allColumns.forEach(column => {
+                if (visibleColumns.has(column)) {
+                    const th = document.createElement('th');
+                    th.textContent = column;
+                    thead.appendChild(th);
+                }
+            });
+        }
+
+        // Tüm sütunları göster
+        function showAllColumns() {
+            visibleColumns = new Set(allColumns);
+            
+            // Tüm checkbox'ları işaretle
+            allColumns.forEach((column, index) => {
+                const checkbox = document.getElementById(`toggle_${index}`);
+                if (checkbox) checkbox.checked = true;
+            });
+            
+            updateTableHeaders();
+            applySearchAndFilters();
+        }
+
+        // Tüm sütunları gizle
+        function hideAllColumns() {
+            visibleColumns.clear();
+            
+            // Tüm checkbox'ları işaretsiz yap
+            allColumns.forEach((column, index) => {
+                const checkbox = document.getElementById(`toggle_${index}`);
+                if (checkbox) checkbox.checked = false;
+            });
+            
+            updateTableHeaders();
+            applySearchAndFilters();
         }
 
         // Display data
@@ -1146,22 +1374,17 @@
             
             pageData.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row['ÜNİVERSİTE'] || ''}</td>
-                    <td>${row['FAKÜLTE'] || ''}</td>
-                    <td>${row['BÖLÜM'] || ''}</td>
-                    <td>${row['GÜNCELLENME TARİHİ'] || ''}</td>
-                    <td>${row['DÖNEM'] || ''}</td>
-                    <td>${row['DERS KODU'] || ''}</td>
-                    <td>${row['DERS GRUBU'] || ''}</td>
-                    <td>${row['DERS ALT GRUBU'] || ''}</td>
-                    <td>${row['DERS ADI'] || ''}</td>
-                    <td>${row['T'] || ''}</td>
-                    <td>${row['U'] || ''}</td>
-                    <td>${row['L'] || ''}</td>
-                    <td>${row['Z/S'] || ''}</td>
-                    <td>${row['AKTS'] || ''}</td>
-                `;
+                let rowHtml = '';
+                
+                // Sadece görünür sütunları göster
+                allColumns.forEach(column => {
+                    if (visibleColumns.has(column)) {
+                        const value = row[column] || '';
+                        rowHtml += `<td>${value}</td>`;
+                    }
+                });
+                
+                tr.innerHTML = rowHtml;
                 tbody.appendChild(tr);
             });
             
@@ -1173,8 +1396,17 @@
             document.getElementById('totalCount').textContent = allData.length.toLocaleString();
             document.getElementById('filteredCount').textContent = filteredData.length.toLocaleString();
             
-            const uniqueUniversite = new Set(allData.map(row => row['ÜNİVERSİTE']).filter(Boolean));
-            const uniqueBolum = new Set(allData.map(row => row['BÖLÜM']).filter(Boolean));
+            // Sadece görünür sütunlardaki verileri hesapla
+            let uniqueUniversite = new Set();
+            let uniqueBolum = new Set();
+            
+            if (visibleColumns.has('ÜNİVERSİTE')) {
+                uniqueUniversite = new Set(allData.map(row => row['ÜNİVERSİTE']).filter(Boolean));
+            }
+            
+            if (visibleColumns.has('BÖLÜM')) {
+                uniqueBolum = new Set(allData.map(row => row['BÖLÜM']).filter(Boolean));
+            }
             
             document.getElementById('universiteCount').textContent = uniqueUniversite.size.toLocaleString();
             document.getElementById('bolumCount').textContent = uniqueBolum.size.toLocaleString();
