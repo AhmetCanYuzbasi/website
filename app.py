@@ -607,11 +607,21 @@ def load_ders_programi_data():
         headers = all_values[0]
         print(f"📋 Başlıklar: {headers}")
         
+        # Sütun isimlerini güncelle
+        updated_headers = []
+        for header in headers:
+            if header == 'GEÇERLİLİK TARİHİ':
+                updated_headers.append('GÜNCELLENME TARİHİ')
+            else:
+                updated_headers.append(header)
+        
+        print(f"📋 Güncellenmiş başlıklar: {updated_headers}")
+        
         # Veri satırlarını al
         data_rows = all_values[1:]
         
         # DataFrame oluştur
-        df = pd.DataFrame(data_rows, columns=headers)
+        df = pd.DataFrame(data_rows, columns=updated_headers)
         print(f'✅ Ders programı worksheet\'inden {len(df)} satır veri yüklendi')
         print('📊 Ders programı başlıkları:', list(df.columns))
         
@@ -639,16 +649,22 @@ def get_ders_programlari():
         if df is None:
             return jsonify({'error': 'Ders programı verisi yüklenemedi'}), 500
         
+        # NaN değerleri temizle
+        df = df.where(pd.notnull(df), None)
+        
         # Veriyi JSON formatına çevir
         data = []
         for _, row in df.iterrows():
             row_dict = {}
             for col in df.columns:
                 value = row[col]
-                # NaN değerleri boş string olarak değiştir
-                if pd.isna(value):
-                    value = ""
-                row_dict[col] = str(value)
+                # NaN ve None değerleri güvenli bir şekilde işle
+                if pd.isna(value) or value is None:
+                    row_dict[col] = None
+                elif isinstance(value, (int, float)) and value != value:  # NaN kontrolü
+                    row_dict[col] = None
+                else:
+                    row_dict[col] = str(value) if value is not None else None
             data.append(row_dict)
         
         return jsonify({
@@ -659,6 +675,8 @@ def get_ders_programlari():
         
     except Exception as e:
         print(f'Ders programı API hatası: {e}')
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'Veri alınırken hata oluştu'}), 500
 
 # Ders programı filtreleri
@@ -671,38 +689,43 @@ def get_ders_programlari_filtreler():
         if df is None:
             return jsonify({'error': 'Ders programı verisi yüklenemedi'}), 500
         
+        # NaN değerleri temizle
+        df = df.where(pd.notnull(df), None)
+        
         # Filtre seçeneklerini hazırla
         filtreler = {}
         
         # Üniversite filtreleri
         if 'ÜNİVERSİTE' in df.columns:
-            universite_list = sorted(df['ÜNİVERSİTE'].dropna().unique())
-            filtreler['universite'] = [str(u) for u in universite_list if str(u).strip()]
+            universite_list = sorted([str(u) for u in df['ÜNİVERSİTE'].unique() if u is not None and str(u).strip()])
+            filtreler['universite'] = universite_list
         
         # Bölüm filtreleri
         if 'BÖLÜM' in df.columns:
-            bolum_list = sorted(df['BÖLÜM'].dropna().unique())
-            filtreler['bolum'] = [str(b) for b in bolum_list if str(b).strip()]
+            bolum_list = sorted([str(b) for b in df['BÖLÜM'].unique() if b is not None and str(b).strip()])
+            filtreler['bolum'] = bolum_list
         
         # Dönem filtreleri
         if 'DÖNEM' in df.columns:
-            donem_list = sorted(df['DÖNEM'].dropna().unique())
-            filtreler['donem'] = [str(d) for d in donem_list if str(d).strip()]
+            donem_list = sorted([str(d) for d in df['DÖNEM'].unique() if d is not None and str(d).strip()])
+            filtreler['donem'] = donem_list
         
         # Ders grubu filtreleri
         if 'DERS GRUBU' in df.columns:
-            ders_grubu_list = sorted(df['DERS GRUBU'].dropna().unique())
-            filtreler['ders_grubu'] = [str(dg) for dg in ders_grubu_list if str(dg).strip()]
+            ders_grubu_list = sorted([str(dg) for dg in df['DERS GRUBU'].unique() if dg is not None and str(dg).strip()])
+            filtreler['ders_grubu'] = ders_grubu_list
         
         # Ders alt grubu filtreleri
         if 'DERS ALT GRUBU' in df.columns:
-            ders_alt_grubu_list = sorted(df['DERS ALT GRUBU'].dropna().unique())
-            filtreler['ders_alt_grubu'] = [str(dag) for dag in ders_alt_grubu_list if str(dag).strip()]
+            ders_alt_grubu_list = sorted([str(dag) for dag in df['DERS ALT GRUBU'].unique() if dag is not None and str(dag).strip()])
+            filtreler['ders_alt_grubu'] = ders_alt_grubu_list
         
         return jsonify(filtreler)
         
     except Exception as e:
         print(f'Ders programı filtre hatası: {e}')
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'Filtreler alınırken hata oluştu'}), 500
 
 # Filtrelenmiş ders programı verileri
@@ -1111,15 +1134,22 @@ def filter_ders_programlari():
         
         print(f"🔍 Filtreleme tamamlandı. Orijinal: {original_count}, Filtrelenmiş: {len(filtered_df)}")
         
+        # NaN değerleri temizle
+        filtered_df = filtered_df.where(pd.notnull(filtered_df), None)
+        
         # Veriyi JSON formatına çevir
         data = []
         for _, row in filtered_df.iterrows():
             row_dict = {}
             for col in filtered_df.columns:
                 value = row[col]
-                if pd.isna(value):
-                    value = ""
-                row_dict[col] = str(value)
+                # NaN ve None değerleri güvenli bir şekilde işle
+                if pd.isna(value) or value is None:
+                    row_dict[col] = None
+                elif isinstance(value, (int, float)) and value != value:  # NaN kontrolü
+                    row_dict[col] = None
+                else:
+                    row_dict[col] = str(value) if value is not None else None
             data.append(row_dict)
         
         return jsonify({
