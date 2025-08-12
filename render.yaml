@@ -1,11 +1,13 @@
 services:
   - type: web
-    name: universite-chatbot
+    name: universite-api
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.0
+        value: 3.9.16
+      - key: GOOGLE_CREDENTIALS
+        sync: false
       - key: GOOGLE_SHEET_ID
-        sync: false  # Bu değeri Render dashboard'dan manuel olarak ayarlayacaksınız
+        sync: false

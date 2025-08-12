@@ -1,89 +1,48 @@
-# Üniversite Tercih Chatbot
+# 🎓 Üniversite API
 
-Bu proje, üniversite tercih sürecinde öğrencilere yardımcı olmak için geliştirilmiş bir web uygulamasıdır. Google Sheets'ten üniversite verilerini çekerek kullanıcılara arama, filtreleme ve sıralama imkanı sunar.
+Python Flask ile geliştirilmiş üniversite bilgi ve ders programı API'si.
 
 ## 🚀 Özellikler
 
-- **Google Sheets Entegrasyonu**: Veriler Google Sheets'ten gerçek zamanlı olarak çekilir
-- **Gelişmiş Arama**: Üniversite adına göre arama yapabilme
-- **Filtreleme**: Şehir ve bölüm grubuna göre filtreleme
-- **Sıralama**: Çeşitli kriterlere göre sıralama
-- **Responsive Tasarım**: Mobil ve masaüstü uyumlu arayüz
-- **Türkçe Desteği**: Türkçe karakterler ve sıralama desteği
-
-## 🛠️ Teknolojiler
-
-- **Backend**: Flask (Python)
-- **Frontend**: HTML, CSS, JavaScript
-- **Veri Kaynağı**: Google Sheets API
-- **Veri İşleme**: Pandas
-- **Deployment**: Render
+- **Üniversite Listesi**: Tüm üniversiteleri listeleme ve filtreleme
+- **Ders Programları**: Bölüm bazında ders programı görüntüleme
+- **Google Sheets Entegrasyonu**: Veri kaynağı olarak Google Sheets kullanımı
+- **RESTful API**: JSON formatında veri sunumu
+- **Filtreleme**: Ülke, şehir, grup, tür bazında filtreleme
 
 ## 📋 Gereksinimler
 
-- Python 3.8+
-- Google Cloud Console hesabı
-- Google Sheets API erişimi
+- Python 3.9+
+- Flask
+- pandas
+- gspread
+- google-auth
 
 ## 🔧 Kurulum
 
-### 1. Projeyi Klonlayın
+### 1. Repository'yi Klonlayın
 ```bash
-git clone <repository-url>
-cd chatbotDeneme
+git clone https://github.com/yourusername/universite-api.git
+cd universite-api
 ```
 
-### 2. Bağımlılıkları Yükleyin
+### 2. Virtual Environment Oluşturun
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# veya
+venv\Scripts\activate     # Windows
+```
+
+### 3. Bağımlılıkları Yükleyin
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Google Sheets API Kurulumu
-
-#### a) Google Cloud Console'da Proje Oluşturun
-1. [Google Cloud Console](https://console.cloud.google.com/) adresine gidin
-2. Yeni proje oluşturun veya mevcut projeyi seçin
-3. Google Sheets API'yi etkinleştirin
-
-#### b) Service Account Oluşturun
-1. "APIs & Services" > "Credentials" bölümüne gidin
-2. "Create Credentials" > "Service Account" seçin
-3. Service account adı: `chatbot-sheets`
-4. Role: "Editor" seçin
-5. "Keys" sekmesine gidin
-6. "Add Key" > "Create new key" > "JSON" seçin
-7. İndirilen dosyayı `credentials.json` olarak kaydedin
-
-#### c) Google Sheets'i Hazırlayın
-1. Google Sheets'te yeni bir sheet oluşturun
-2. Aşağıdaki sütunları ekleyin:
-   - Üniversite Adı
-   - Program Kodu
-   - Fakülte Adı
-   - Şehir
-   - Grup
-   - Program Adı
-   - Kontenjan
-   - 2024 Başarı Sırası
-   - 2024 YKS En Küçük Puanı
-3. Service account'u paylaşın: `chatbot-sheets@your-project.iam.gserviceaccount.com`
-4. Role: "Editor" verin
-
 ### 4. Environment Variables Ayarlayın
-
-#### Windows PowerShell:
-```powershell
-$env:GOOGLE_SHEET_ID = "your-sheet-id-here"
-```
-
-#### Windows CMD:
-```cmd
-set GOOGLE_SHEET_ID=your-sheet-id-here
-```
-
-#### Linux/Mac:
 ```bash
-export GOOGLE_SHEET_ID="your-sheet-id-here"
+export GOOGLE_CREDENTIALS="your_google_credentials_json"
+export GOOGLE_SHEET_ID="your_google_sheet_id"
 ```
 
 ### 5. Uygulamayı Çalıştırın
@@ -91,70 +50,71 @@ export GOOGLE_SHEET_ID="your-sheet-id-here"
 python app.py
 ```
 
-Uygulama `http://localhost:10000` adresinde çalışacaktır.
+## 🌐 API Endpoints
 
-## 🌐 Render'da Deployment
-
-### 1. GitHub'a Push Edin
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
+### Üniversite Listesi
+```
+GET /api/universiteler
+GET /api/universiteler?search=İstanbul&ulke=Türkiye
 ```
 
-### 2. Render'da Yeni Web Service Oluşturun
-1. [Render Dashboard](https://dashboard.render.com/) adresine gidin
-2. "New" > "Web Service" seçin
-3. GitHub repository'nizi bağlayın
-4. Aşağıdaki ayarları yapın:
-   - **Name**: `universite-chatbot`
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
+### Filtreler
+```
+GET /api/filtreler
+GET /api/sehirler?ulke=Türkiye
+```
 
-### 3. Environment Variables Ayarlayın
-Render dashboard'da "Environment" sekmesine gidin ve şu değişkenleri ekleyin:
-- `GOOGLE_SHEET_ID`: Google Sheets ID'niz
-- `PYTHON_VERSION`: `3.12.0`
+### Ders Programı
+```
+GET /api/ders-programi
+GET /api/ders-programi-filtreler
+```
 
-### 4. Google Sheets Credentials
-Render'da environment variables'a credentials.json içeriğini ekleyin:
-- `GOOGLE_CREDENTIALS`: credentials.json dosyasının tüm içeriği
+### Üniversite Detayı
+```
+GET /api/universite/{program_kodu}
+```
 
-### 5. Deploy Edin
-"Create Web Service" butonuna tıklayın. Render otomatik olarak deploy edecektir.
+## 📊 Veri Yapısı
 
-## 📊 Veri Formatı
+### Üniversite Verileri
+- Üniversite Adı
+- Program Kodu
+- Fakülte Adı
+- Şehir
+- Ülke
+- Grup
+- YKS Puanı
+- Kontenjan
 
-Google Sheets'teki veriler şu formatta olmalıdır:
+### Ders Programı Verileri
+- Üniversite
+- Bölüm
+- Dönem
+- Ders Grubu
+- Ders Alt Grubu
 
-| Üniversite Adı | Program Kodu | Fakülte Adı | Şehir | Grup | Program Adı | Kontenjan | 2024 Başarı Sırası | 2024 YKS En Küçük Puanı |
-|----------------|--------------|-------------|-------|------|-------------|-----------|-------------------|------------------------|
-| İstanbul Üniversitesi | 101110001 | Tıp Fakültesi | İstanbul | MF-3 | Tıp | 100 | 1500 | 450,5 |
+## 🔒 Güvenlik
 
-## 🔍 API Endpoints
+- Google Sheets API anahtarları environment variables olarak saklanır
+- API rate limiting uygulanır
+- Input validation ve sanitization yapılır
 
-- `GET /` - Ana sayfa
-- `GET /api/universiteler` - Üniversite listesi
-- `GET /api/filtreler` - Filtre seçenekleri
-- `GET /api/universite/<program_kodu>` - Üniversite detayı
-- `GET /api/status` - Sistem durumu
+## 🚀 Deployment
 
-## 🐛 Sorun Giderme
+### Render.com
+1. Repository'yi Render.com'a bağlayın
+2. Environment variables'ları ayarlayın
+3. Build command: `pip install -r requirements.txt`
+4. Start command: `gunicorn app:app`
 
-### Google Sheets Bağlantı Sorunu
-1. `credentials.json` dosyasının doğru konumda olduğunu kontrol edin
-2. Service account'un Google Sheets'e erişim izni olduğunu kontrol edin
-3. `GOOGLE_SHEET_ID` environment variable'ının doğru ayarlandığını kontrol edin
-
-### Sayı Formatı Sorunu
-- YKS puanları virgüllü olarak girilmelidir (örn: 439,03)
-- Sistem otomatik olarak virgülü nokta ile değiştirir
-
-### Render Deployment Sorunu
-1. Build loglarını kontrol edin
-2. Environment variables'ın doğru ayarlandığından emin olun
-3. `requirements.txt` dosyasının güncel olduğunu kontrol edin
+### Heroku
+```bash
+heroku create your-app-name
+git push heroku main
+heroku config:set GOOGLE_CREDENTIALS="your_credentials"
+heroku config:set GOOGLE_SHEET_ID="your_sheet_id"
+```
 
 ## 📝 Lisans
 
@@ -162,12 +122,21 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ## 🤝 Katkıda Bulunma
 
-1. Fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit edin (`git commit -m 'Add some amazing feature'`)
-4. Push edin (`git push origin feature/amazing-feature`)
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
+3. Commit yapın (`git commit -m 'Add some AmazingFeature'`)
+4. Push yapın (`git push origin feature/AmazingFeature`)
 5. Pull Request oluşturun
 
 ## 📞 İletişim
 
-Sorularınız için issue açabilir veya iletişime geçebilirsiniz. 
+- **Proje Sahibi**: [Your Name]
+- **Email**: your.email@example.com
+- **GitHub**: [@yourusername](https://github.com/yourusername)
+
+## 🙏 Teşekkürler
+
+- Flask framework
+- Google Sheets API
+- Pandas kütüphanesi
+- Açık kaynak topluluğu 
