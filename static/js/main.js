@@ -404,7 +404,7 @@ function displayUniversities(universities) {
         <div class="university-card" onclick="goToUniversityDetail('${uni['Program Kodu']}')">
             <div class="university-name">
                 <i class="fas fa-university me-2 text-primary"></i>
-                ${uni['Üniversite Adı']}
+                ${uni['Üniversite Adı']} - ${uni['Program Adı']}
             </div>
             <div class="university-info">
                 <div class="row">
