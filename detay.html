@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Üniversite Detayları - BMO Bilgi Bankası</title>
+    <title>Üniversite Detayları-ÜBE</title>
     <link rel="icon" type="image/png" href="/static/tbkLogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -91,6 +91,27 @@
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
+        }
+        
+        .test-warning {
+            margin-bottom: 20px;
+        }
+        
+        .test-warning .alert {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+        }
+        
+        .test-warning .alert:hover {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.5);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
         }
 
         .header-section::before {
@@ -258,6 +279,42 @@
             font-size: 1.1em;
         }
 
+        .info-value a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .info-value a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .wikipedia-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .wikipedia-link:hover {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .wikipedia-link i {
+            font-size: 1rem;
+            margin-right: 6px;
+        }
+
         .contact-link {
             color: var(--primary-color);
             text-decoration: none;
@@ -375,6 +432,13 @@
                     <!-- Header -->
                     <div class="header-section">
                         <div class="header-content">
+                            <!-- Test Aşamasındadır Uyarısı -->
+                            <div class="test-warning mb-3">
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <strong>⚠️ Bu Sayfa Test Aşamasındadır</strong>
+                                </div>
+                            </div>
+                            
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="#" id="backBtn" class="btn back-btn">
                                     <i class="fas fa-arrow-left me-2"></i>Ana Sayfaya Dön
@@ -384,10 +448,10 @@
                                     <span id="headerUniversiteAdi">Üniversite Adı</span> Detayları
                                 </h1>
                             </div>
-                                                         <div id="loadingIndicator" class="text-center">
-                                 <i class="fas fa-spinner fa-spin fa-2x text-light mb-2"></i>
-                                 <p class="text-light fw-bold">Üniversite bilgileri yükleniyor...</p>
-                             </div>
+                            <div id="loadingIndicator" class="text-center">
+                                <i class="fas fa-spinner fa-spin fa-2x text-light mb-2"></i>
+                                <p class="text-light fw-bold">Üniversite bilgileri yükleniyor...</p>
+                            </div>
                         </div>
                     </div>
 
@@ -395,7 +459,7 @@
                     <div id="contentContainer" style="display: none;">
                         <!-- Stats Cards -->
                         <div class="row mb-4">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-users"></i>
@@ -404,7 +468,7 @@
                                     <div class="stats-label">Kontenjan</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-chart-line"></i>
@@ -413,7 +477,7 @@
                                     <div class="stats-label">YKS Puanı</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-trophy"></i>
@@ -422,7 +486,25 @@
                                     <div class="stats-label">Başarı Sırası</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
+                                <div class="stats-card text-center">
+                                    <div class="stats-icon">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <div class="stats-number" id="yksAralik">-</div>
+                                    <div class="stats-label">YKS Puanı Aralığı</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stats-card text-center">
+                                    <div class="stats-icon">
+                                        <i class="fas fa-sort-numeric-down"></i>
+                                    </div>
+                                    <div class="stats-number" id="basariAralik">-</div>
+                                    <div class="stats-label">Başarı Sırası Aralığı</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-calendar-alt"></i>
@@ -448,12 +530,7 @@
                                                  <div class="info-value" id="universiteAdi">-</div>
                                              </div>
                                          </div>
-                                         <div class="col-md-6">
-                                             <div class="info-item">
-                                                 <div class="info-label">Program Kodu</div>
-                                                 <div class="info-value" id="programKodu">-</div>
-                                             </div>
-                                         </div>
+
                                          <div class="col-md-6">
                                              <div class="info-item">
                                                  <div class="info-label">Fakülte Adı</div>
@@ -494,6 +571,13 @@
                                              <div class="info-item">
                                                  <div class="info-label">Tür</div>
                                                  <div class="info-value" id="tur">-</div>
+                                             </div>
+                                         </div>
+
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">Akreditasyon</div>
+                                                 <div class="info-value" id="akreditasyon">-</div>
                                              </div>
                                          </div>
                                      </div>
@@ -581,6 +665,17 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="info-item">
+                                                <div class="info-label">Wikipedia Sayfası</div>
+                                                <div class="info-value">
+                                                    <a href="#" id="wikipediaSayfasiLink" class="contact-link wikipedia-link" target="_blank">
+                                                        <i class="fab fa-wikipedia-w me-1"></i>
+                                                        Wikipedia Sayfası
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -619,7 +714,11 @@
         // Get program code from URL
         function getProgramCode() {
             const pathParts = window.location.pathname.split('/');
-            return pathParts[pathParts.length - 1];
+            const programCode = pathParts[pathParts.length - 1];
+            console.log('URL path:', window.location.pathname);
+            console.log('Path parts:', pathParts);
+            console.log('Program code:', programCode);
+            return programCode;
         }
 
         // Load university data
@@ -630,96 +729,243 @@
                 const response = await fetch(`/api/universite/${programCode}`);
                 
                 if (!response.ok) {
-                    throw new Error('Üniversite bulunamadı');
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
+                
+                // Veri kontrolü
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Geçersiz veri formatı');
+                }
+                
                 displayUniversityData(data);
                 
             } catch (error) {
                 console.error('Error loading university data:', error);
-                showError(error.message);
+                
+                // JSON parse hatası kontrolü
+                if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
+                    showError('Sunucudan gelen veri formatı hatalı. Lütfen sayfayı yenileyin.');
+                } else if (error.message.includes('HTTP')) {
+                    showError(`Sunucu hatası: ${error.message}`);
+                } else {
+                    showError('Üniversite bilgileri yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+                }
             }
         }
 
         // Display university data
         function displayUniversityData(data) {
-            // Hide loading, show content
-            document.getElementById('loadingIndicator').style.display = 'none';
-            document.getElementById('contentContainer').style.display = 'block';
+            try {
+                // Hide loading, show content
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('contentContainer').style.display = 'block';
 
-            // Stats cards
-            document.getElementById('kontenjan').textContent = data['Kontenjan'] || '-';
-            document.getElementById('puan').textContent = data['2024 YKS En Küçük Puanı'] || '-';
-            document.getElementById('siralama').textContent = data['2024 Başarı Sırası'] || '-';
-            document.getElementById('kurulus').textContent = data['Kuruluş Tarihi'] || '-';
-
-            // Function to format university name with line breaks at parentheses
-            function formatUniversityName(name) {
-                if (!name) return '-';
-                // Find the first opening parenthesis and split there
-                const parenIndex = name.indexOf('(');
-                if (parenIndex !== -1) {
-                    const beforeParen = name.substring(0, parenIndex).trim();
-                    const afterParen = name.substring(parenIndex).trim();
-                    return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                // Güvenli değer alma fonksiyonu
+                function safeGetValue(key, defaultValue = '-') {
+                    const value = data[key];
+                    console.log(`safeGetValue for ${key}:`, value, 'type:', typeof value);
+                    if (value === null || value === undefined) {
+                        return defaultValue;
+                    }
+                    // NaN kontrolü ekle
+                    if (typeof value === 'number' && isNaN(value)) {
+                        return defaultValue;
+                    }
+                    return value;
                 }
-                return name;
-            }
 
-            // Basic information
-            const universiteAdi = data['Üniversite Adı'] || '-';
-            
-            // Update header title with formatted name
-            const headerSpan = document.querySelector('#headerUniversiteAdi');
-            if (headerSpan) {
-                headerSpan.innerHTML = formatUniversityName(universiteAdi);
-            }
-            
-            // Update content area university name
-            const contentUniversiteAdi = document.getElementById('universiteAdi');
-            if (contentUniversiteAdi) {
-                contentUniversiteAdi.innerHTML = formatUniversityName(universiteAdi);
-            }
-            document.getElementById('programKodu').textContent = data['Program Kodu'] || '-';
-            document.getElementById('fakulteAdi').textContent = data['Fakülte Adı'] || '-';
-            document.getElementById('programAdi').textContent = data['Program Adı'] || '-';
-            document.getElementById('ulke').textContent = data['Ülke'] || '-';
-            document.getElementById('sehir').textContent = data['Şehir'] || '-';
-            document.getElementById('grup').textContent = data['Grup'] || '-';
-            document.getElementById('kurulusTarihi').textContent = data['Kuruluş Tarihi'] || '-';
-            document.getElementById('tur').textContent = data['Tür'] || '-';
+                // Stats cards
+                document.getElementById('kontenjan').textContent = safeGetValue('Kontenjan');
+                
+                // YKS Puanı formatını düzenle (örn: "35288-264391(KKTC)")
+                const yksPuan = safeGetValue('2024 YKS En Küçük Puanı');
+                console.log('YKS Puanı raw value:', yksPuan, 'type:', typeof yksPuan);
+                if (yksPuan && yksPuan !== '-') {
+                    const formattedPuan = formatYksPuan(yksPuan);
+                    console.log('Formatted YKS Puanı:', formattedPuan);
+                    document.getElementById('puan').innerHTML = formattedPuan;
+                } else {
+                    document.getElementById('puan').textContent = '-';
+                }
+                
+                // Başarı Sırası formatını düzenle (örn: "35288-264391(KKTC)")
+                const basariSirasi = safeGetValue('2024 Başarı Sırası');
+                console.log('Başarı Sırası raw value:', basariSirasi, 'type:', typeof basariSirasi);
+                if (basariSirasi && basariSirasi !== '-') {
+                    const formattedSira = formatBasariSirasi(basariSirasi);
+                    console.log('Formatted Başarı Sırası:', formattedSira);
+                    document.getElementById('siralama').innerHTML = formattedSira;
+                } else {
+                    document.getElementById('siralama').textContent = '-';
+                }
+                
+                // Aralık alanları (şimdilik mevcut değil)
+                document.getElementById('yksAralik').textContent = '-';
+                document.getElementById('basariAralik').textContent = '-';
+                
+                // Kuruluş Tarihi stats card'da gösteriliyor
+                // document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');
 
-            // Contact information
-            document.getElementById('adres').textContent = data['Adres'] || '-';
-            document.getElementById('telefon').textContent = data['Telefon'] || '-';
-            document.getElementById('eposta').textContent = data['E-posta'] || '-';
-            document.getElementById('rektor').textContent = data['Rektör'] || '-';
+                // Function to format university name with line breaks at parentheses
+                function formatUniversityName(name) {
+                    if (!name || name === '-') return '-';
+                    
+                    // Değeri string'e çevir
+                    const nameStr = String(name);
+                    
+                    // Find the first opening parenthesis and split there
+                    const parenIndex = nameStr.indexOf('(');
+                    if (parenIndex !== -1) {
+                        const beforeParen = nameStr.substring(0, parenIndex).trim();
+                        const afterParen = nameStr.substring(parenIndex).trim();
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                    }
+                    return nameStr;
+                }
+                
+                // Function to format YKS Puanı (örn: "35288-264391(KKTC)")
+                function formatYksPuan(puan) {
+                    if (!puan || puan === '-') return '-';
+                    
+                    // Değeri string'e çevir
+                    const puanStr = String(puan);
+                    
+                    // Parantez içindeki kısmı bul
+                    const parenIndex = puanStr.indexOf('(');
+                    if (parenIndex !== -1) {
+                        const beforeParen = puanStr.substring(0, parenIndex).trim();
+                        const afterParen = puanStr.substring(parenIndex).trim();
+                        
+                        // Tire ile ayrılmış değerleri kontrol et
+                        if (beforeParen.includes('-')) {
+                            const parts = beforeParen.split('-');
+                            if (parts.length === 2) {
+                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #b0bec5;">${afterParen}</span>`;
+                            }
+                        }
+                        
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                    }
+                    
+                    // Parantez yoksa tire ile ayrılmış değerleri kontrol et
+                    if (puanStr.includes('-')) {
+                        const parts = puanStr.split('-');
+                        if (parts.length === 2) {
+                            return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span>`;
+                        }
+                    }
+                    
+                    return puanStr;
+                }
+                
+                // Function to format Başarı Sırası (örn: "35288-264391(KKTC)")
+                function formatBasariSirasi(sira) {
+                    if (!sira || sira === '-') return '-';
+                    
+                    // Değeri string'e çevir
+                    const siraStr = String(sira);
+                    
+                    // Parantez içindeki kısmı bul
+                    const parenIndex = siraStr.indexOf('(');
+                    if (parenIndex !== -1) {
+                        const beforeParen = siraStr.substring(0, parenIndex).trim();
+                        const afterParen = siraStr.substring(parenIndex).trim();
+                        
+                        // Tire ile ayrılmış değerleri kontrol et
+                        if (beforeParen.includes('-')) {
+                            const parts = beforeParen.split('-');
+                            if (parts.length === 2) {
+                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #b0bec5;">${afterParen}</span>`;
+                            }
+                        }
+                        
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                    }
+                    
+                    // Parantez yoksa tire ile ayrılmış değerleri kontrol et
+                    if (siraStr.includes('-')) {
+                        const parts = siraStr.split('-');
+                        if (parts.length === 2) {
+                            return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span>`;
+                        }
+                    }
+                    
+                    return siraStr;
+                }
 
-            // Website links
-            const uniLink = document.getElementById('uniLink');
-            const fakulteLink = document.getElementById('fakulteLink');
-            const bolumLink = document.getElementById('bolumLink');
+                // Basic information
+                const universiteAdi = safeGetValue('Üniversite Adı');
+                
+                // Update header title with formatted name
+                const headerSpan = document.querySelector('#headerUniversiteAdi');
+                if (headerSpan) {
+                    headerSpan.innerHTML = formatUniversityName(universiteAdi);
+                }
+                
+                // Update content area university name
+                const contentUniversiteAdi = document.getElementById('universiteAdi');
+                if (contentUniversiteAdi) {
+                    contentUniversiteAdi.innerHTML = formatUniversityName(universiteAdi);
+                }
+                
+                document.getElementById('fakulteAdi').textContent = safeGetValue('Fakülte Adı');
+                document.getElementById('programAdi').textContent = safeGetValue('Program Adı');
+                document.getElementById('ulke').textContent = safeGetValue('Ülke');
+                document.getElementById('sehir').textContent = safeGetValue('Şehir');
+                document.getElementById('grup').textContent = safeGetValue('Grup');
+                document.getElementById('kurulusTarihi').textContent = safeGetValue('Kuruluş Tarihi');
+                document.getElementById('tur').textContent = safeGetValue('Tür');
+                
+                // Akreditasyon
+                document.getElementById('akreditasyon').textContent = safeGetValue('Akreditasyon');
 
-            if (data['Üni Alan Adı']) {
-                uniLink.href = data['Üni Alan Adı'];
-                uniLink.style.display = 'inline-block';
-            } else {
-                uniLink.style.display = 'none';
-            }
+                // Contact information
+                document.getElementById('adres').textContent = safeGetValue('Adres');
+                document.getElementById('telefon').textContent = safeGetValue('Telefon');
+                document.getElementById('eposta').textContent = safeGetValue('E-posta');
+                document.getElementById('rektor').textContent = safeGetValue('Rektör');
 
-            if (data['Fakülte Alan adı']) {
-                fakulteLink.href = data['Fakülte Alan adı'];
-                fakulteLink.style.display = 'inline-block';
-            } else {
-                fakulteLink.style.display = 'none';
-            }
+                // Website links
+                const uniLink = document.getElementById('uniLink');
+                const fakulteLink = document.getElementById('fakulteLink');
+                const bolumLink = document.getElementById('bolumLink');
 
-            if (data['Bölüm Alan Adı']) {
-                bolumLink.href = data['Bölüm Alan Adı'];
-                bolumLink.style.display = 'inline-block';
-            } else {
-                bolumLink.style.display = 'none';
+                if (safeGetValue('Üni Alan Adı', '') !== '-') {
+                    uniLink.href = safeGetValue('Üni Alan Adı');
+                    uniLink.style.display = 'inline-block';
+                } else {
+                    uniLink.style.display = 'none';
+                }
+
+                if (safeGetValue('Fakülte Alan adı', '') !== '-') {
+                    fakulteLink.href = safeGetValue('Fakülte Alan adı');
+                    fakulteLink.style.display = 'inline-block';
+                } else {
+                    fakulteLink.style.display = 'none';
+                }
+
+                if (safeGetValue('Bölüm Alan Adı', '') !== '-') {
+                    bolumLink.href = safeGetValue('Bölüm Alan Adı');
+                    bolumLink.style.display = 'inline-block';
+                } else {
+                    bolumLink.style.display = 'none';
+                }
+
+                // Wikipedia link
+                const wikipediaSayfasiLink = document.getElementById('wikipediaSayfasiLink');
+
+                if (safeGetValue('Wikipedia Sayfası', '') !== '-') {
+                    wikipediaSayfasiLink.href = safeGetValue('Wikipedia Sayfası');
+                    wikipediaSayfasiLink.style.display = 'inline-block';
+                } else {
+                    wikipediaSayfasiLink.style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error displaying university data:', error);
+                showError('Üniversite bilgileri gösterilirken bir hata oluştu.');
             }
         }
 
