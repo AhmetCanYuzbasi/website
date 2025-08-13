@@ -245,6 +245,33 @@
             font-size: 0.9em;
         }
 
+        /* Stats section centering and spacing */
+        .stats-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stats-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stats-card .stats-icon {
+            margin-bottom: 10px;
+        }
+
+        .stats-card .stats-number {
+            margin-bottom: 8px;
+        }
+
+        .stats-card .stats-label {
+            margin-bottom: 0;
+        }
+
         .info-section {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -475,8 +502,8 @@
                     <!-- Content -->
                     <div id="contentContainer" style="display: none;">
                         <!-- Stats Cards -->
-                        <div class="row mb-4">
-                            <div class="col-md-2">
+                        <div class="row mb-4 justify-content-center">
+                            <div class="col-md-3 col-lg-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-users"></i>
@@ -485,7 +512,7 @@
                                     <div class="stats-label">Kontenjan</div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3 col-lg-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-chart-line"></i>
@@ -494,7 +521,7 @@
                                     <div class="stats-label">YKS Puanı</div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3 col-lg-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-trophy"></i>
@@ -503,8 +530,7 @@
                                     <div class="stats-label">Başarı Sırası</div>
                                 </div>
                             </div>
-
-                            <div class="col-md-2">
+                            <div class="col-md-3 col-lg-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-calendar-alt"></i>
@@ -814,7 +840,8 @@
                 }
                 
                 // Aralık alanları
-
+                const yksAralikValue = safeGetValue('2024 YKS Puanı Aralığı');
+                const basariAralikValue = safeGetValue('2024 Başarı Sırası Aralığı');
                 
                 // Kuruluş Tarihi stats card'da göster
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');

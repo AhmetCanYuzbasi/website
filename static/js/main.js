@@ -442,13 +442,17 @@ function displayUniversities(universities) {
                     ` : ''}
                 </div>
                 <div class="row mt-2">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <i class="fas fa-chart-line me-1"></i>
                         <strong>2024 Puanı:</strong> ${uni['2024 YKS En Küçük Puanı']}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <i class="fas fa-trophy me-1"></i>
                         <strong>Başarı Sırası:</strong> ${uni['2024 Başarı Sırası']}
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        <strong>Başarı Sırası Aralığı:</strong> ${uni['2024 Başarı Sırası Aralığı'] || '-'}
                     </div>
                 </div>
                 ${uni['Wikipedia Alan Adı'] ? `
