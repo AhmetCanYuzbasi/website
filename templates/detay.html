@@ -114,26 +114,7 @@
             transition: all 0.3s ease;
         }
         
-        /* Stats Cards için özel stiller */
-        .stats-card .stats-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 10px 0;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-        
-        /* Aralık değerleri için küçük font */
-        .stats-card .stats-number.aralik-deger {
-            font-size: 1.1rem;
-            line-height: 1.3;
-        }
-        
-        /* Çok uzun değerler için daha da küçük font */
-        .stats-card .stats-number.uzun-deger {
-            font-size: 0.9rem;
-            line-height: 1.2;
-        }
+
         
         /* Temel Bilgiler'deki aralık alanları için küçük font */
         .info-item .info-value.aralik-deger {
@@ -522,24 +503,7 @@
                                     <div class="stats-label">Başarı Sırası</div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="stats-card text-center">
-                                    <div class="stats-icon">
-                                        <i class="fas fa-chart-bar"></i>
-                                    </div>
-                                    <div class="stats-number" id="yksAralik">-</div>
-                                    <div class="stats-label">YKS Puanı Aralığı</div>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="stats-card text-center">
-                                    <div class="stats-icon">
-                                        <i class="fas fa-sort-numeric-down"></i>
-                                    </div>
-                                    <div class="stats-number" id="basariAralik">-</div>
-                                    <div class="stats-label">Başarı Sırası Aralığı</div>
-                                </div>
-                            </div>
+
                             <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
@@ -850,38 +814,7 @@
                 }
                 
                 // Aralık alanları
-                const yksAralikValue = safeGetValue('2024 YKS Puanı Aralığı');
-                const basariAralikValue = safeGetValue('2024 Başarı Sırası Aralığı');
-                
-                console.log('YKS Puanı Aralığı raw value:', yksAralikValue, 'type:', typeof yksAralikValue);
-                console.log('Başarı Sırası Aralığı raw value:', basariAralikValue, 'type:', typeof basariAralikValue);
-                
-                const yksAralikElement = document.getElementById('yksAralik');
-                const basariAralikElement = document.getElementById('basariAralik');
-                
-                // YKS Puanı Aralığı
-                yksAralikElement.textContent = yksAralikValue;
-                if (yksAralikValue && yksAralikValue !== '-') {
-                    if (yksAralikValue.length > 20) {
-                        yksAralikElement.className = 'stats-number uzun-deger';
-                    } else if (yksAralikValue.length > 10) {
-                        yksAralikElement.className = 'stats-number aralik-deger';
-                    } else {
-                        yksAralikElement.className = 'stats-number';
-                    }
-                }
-                
-                // Başarı Sırası Aralığı
-                basariAralikElement.textContent = basariAralikValue;
-                if (basariAralikValue && basariAralikValue !== '-') {
-                    if (basariAralikValue.length > 20) {
-                        basariAralikElement.className = 'stats-number uzun-deger';
-                    } else if (basariAralikValue.length > 10) {
-                        basariAralikElement.className = 'stats-number aralik-deger';
-                    } else {
-                        basariAralikElement.className = 'stats-number';
-                    }
-                }
+
                 
                 // Kuruluş Tarihi stats card'da göster
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');

@@ -153,6 +153,19 @@ def load_data():
         # Metin sütunları (aralık bilgileri için)
         text_columns = ['2024 YKS Puanı Aralığı', '2024 Başarı Sırası Aralığı']
         
+        # Aralık sütunlarını kontrol et
+        print('🔍 Aralık sütunları kontrol ediliyor...')
+        for col in text_columns:
+            if col in df.columns:
+                print(f'✅ {col} sütunu bulundu')
+                print(f'   Örnek değerler: {df[col].head().tolist()}')
+            else:
+                print(f'❌ {col} sütunu bulunamadı!')
+                # Benzer isimleri ara
+                similar_cols = [c for c in df.columns if 'aralık' in c.lower() or 'puanı' in c.lower()]
+                if similar_cols:
+                    print(f'   Benzer sütunlar: {similar_cols}')
+        
         for col in numeric_columns:
             if col in df.columns:
                 if col == '2024 YKS En Küçük Puanı':
