@@ -113,6 +113,42 @@
             transform: translateY(-2px);
             transition: all 0.3s ease;
         }
+        
+        /* Stats Cards için özel stiller */
+        .stats-card .stats-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* Aralık değerleri için küçük font */
+        .stats-card .stats-number.aralik-deger {
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+        
+        /* Çok uzun değerler için daha da küçük font */
+        .stats-card .stats-number.uzun-deger {
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+        
+        /* Temel Bilgiler'deki aralık alanları için küçük font */
+        .info-item .info-value.aralik-deger {
+            font-size: 0.9rem;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .info-item .info-value.uzun-deger {
+            font-size: 0.8rem;
+            line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
 
         .header-section::before {
             content: '';
@@ -580,6 +616,18 @@
                                                  <div class="info-value" id="akreditasyon">-</div>
                                              </div>
                                          </div>
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">YKS Puanı Aralığı</div>
+                                                 <div class="info-value" id="yksAralikTemel">-</div>
+                                             </div>
+                                         </div>
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">Başarı Sırası Aralığı</div>
+                                                 <div class="info-value" id="basariAralikTemel">-</div>
+                                             </div>
+                                         </div>
                                      </div>
                                  </div>
                              </div>
@@ -802,8 +850,38 @@
                 }
                 
                 // Aralık alanları
-                document.getElementById('yksAralik').textContent = safeGetValue('2024 YKS Puanı Aralığı');
-                document.getElementById('basariAralik').textContent = safeGetValue('2024 Başarı Sırası Aralığı');
+                const yksAralikValue = safeGetValue('2024 YKS Puanı Aralığı');
+                const basariAralikValue = safeGetValue('2024 Başarı Sırası Aralığı');
+                
+                console.log('YKS Puanı Aralığı raw value:', yksAralikValue, 'type:', typeof yksAralikValue);
+                console.log('Başarı Sırası Aralığı raw value:', basariAralikValue, 'type:', typeof basariAralikValue);
+                
+                const yksAralikElement = document.getElementById('yksAralik');
+                const basariAralikElement = document.getElementById('basariAralik');
+                
+                // YKS Puanı Aralığı
+                yksAralikElement.textContent = yksAralikValue;
+                if (yksAralikValue && yksAralikValue !== '-') {
+                    if (yksAralikValue.length > 20) {
+                        yksAralikElement.className = 'stats-number uzun-deger';
+                    } else if (yksAralikValue.length > 10) {
+                        yksAralikElement.className = 'stats-number aralik-deger';
+                    } else {
+                        yksAralikElement.className = 'stats-number';
+                    }
+                }
+                
+                // Başarı Sırası Aralığı
+                basariAralikElement.textContent = basariAralikValue;
+                if (basariAralikValue && basariAralikValue !== '-') {
+                    if (basariAralikValue.length > 20) {
+                        basariAralikElement.className = 'stats-number uzun-deger';
+                    } else if (basariAralikValue.length > 10) {
+                        basariAralikElement.className = 'stats-number aralik-deger';
+                    } else {
+                        basariAralikElement.className = 'stats-number';
+                    }
+                }
                 
                 // Kuruluş Tarihi stats card'da göster
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');
@@ -920,6 +998,34 @@
                 
                 // Akreditasyon
                 document.getElementById('akreditasyon').textContent = safeGetValue('Akreditasyon');
+                
+                // Temel Bilgiler'de aralık alanları
+                const yksAralikTemelElement = document.getElementById('yksAralikTemel');
+                const basariAralikTemelElement = document.getElementById('basariAralikTemel');
+                
+                // YKS Puanı Aralığı Temel Bilgiler
+                yksAralikTemelElement.textContent = safeGetValue('2024 YKS Puanı Aralığı');
+                if (yksAralikValue && yksAralikValue !== '-') {
+                    if (yksAralikValue.length > 20) {
+                        yksAralikTemelElement.className = 'info-value uzun-deger';
+                    } else if (yksAralikValue.length > 10) {
+                        yksAralikTemelElement.className = 'info-value aralik-deger';
+                    } else {
+                        yksAralikTemelElement.className = 'info-value';
+                    }
+                }
+                
+                // Başarı Sırası Aralığı Temel Bilgiler
+                basariAralikTemelElement.textContent = safeGetValue('2024 Başarı Sırası Aralığı');
+                if (basariAralikValue && basariAralikValue !== '-') {
+                    if (basariAralikValue.length > 20) {
+                        basariAralikTemelElement.className = 'info-value uzun-deger';
+                    } else if (basariAralikValue.length > 10) {
+                        basariAralikTemelElement.className = 'info-value aralik-deger';
+                    } else {
+                        basariAralikTemelElement.className = 'info-value';
+                    }
+                }
 
                 // Contact information
                 document.getElementById('adres').textContent = safeGetValue('Adres');
