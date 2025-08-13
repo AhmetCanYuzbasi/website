@@ -135,8 +135,23 @@ def load_data():
         print(f'✅ Ana veri worksheet\'inden {len(df)} satır veri yüklendi')
         print('📊 Ana veri başlıkları:', list(df.columns))
         
-        # Sayısal sütunları düzelt
+        # Tekrarlanan sütunları temizle
+        print('🔍 Tekrarlanan sütunlar kontrol ediliyor...')
+        duplicate_columns = df.columns[df.columns.duplicated()].tolist()
+        if duplicate_columns:
+            print(f'⚠️ Tekrarlanan sütunlar bulundu: {duplicate_columns}')
+            # Tekrarlanan sütunları kaldır (ilk olanları tut)
+            df = df.loc[:, ~df.columns.duplicated()]
+            print(f'✅ Tekrarlanan sütunlar kaldırıldı. Yeni sütun sayısı: {len(df.columns)}')
+            print(f'📊 Güncellenmiş başlıklar: {list(df.columns)}')
+        else:
+            print('✅ Tekrarlanan sütun bulunamadı')
+        
+        # Sayısal sütunları düzelt (sıralama için kullanılacak)
         numeric_columns = ['Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı']
+        
+        # Metin sütunları (aralık bilgileri için)
+        text_columns = ['2024 YKS Puanı Aralığı', '2024 Başarı Sırası Aralığı']
         
         for col in numeric_columns:
             if col in df.columns:
@@ -204,7 +219,7 @@ def get_universiteler():
         sort_by = request.args.get('sort_by', 'Üniversite Adı')
         sort_order = request.args.get('sort_order', 'asc')
         
-        # Sıralama öncesi: sayısal sütunları dönüştür
+        # Sıralama öncesi: sayısal sütunları dönüştür (sıralama için kullanılacak)
         for col in ['2024 YKS En Küçük Puanı', '2024 Başarı Sırası', 'Kontenjan']:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -438,7 +453,7 @@ def add_universite():
         
         sheet = client.open_by_key(SHEET_ID).sheet1
         
-        # Yeni satır olarak ekle (tüm sütunlar dahil)
+        # Yeni satır olarak ekle (mevcut sütunlara göre)
         row_data = [
             data.get('Üniversite Adı', ''),
             data.get('Program Kodu', ''),
@@ -459,7 +474,6 @@ def add_universite():
             data.get('Fakülte Alan adı', ''),
             data.get('Bölüm Alan Adı', ''),
             data.get('Tür', ''),
-            data.get('Wikipedia Alan Adı', ''),
             data.get('Wikipedia Sayfası', ''),
             data.get('Akreditasyon', '')
         ]
@@ -502,7 +516,7 @@ def update_universite(program_kodu):
         
         # Güncellenecek alanları belirle
         update_data = []
-        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı', 'Tür', 'Wikipedia Alan Adı', 'Wikipedia Sayfası', 'Akreditasyon']:
+        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı', 'Tür', 'Wikipedia Sayfası', 'Akreditasyon']:
             if field in data:
                 update_data.append(data[field])
             else:
@@ -510,8 +524,8 @@ def update_universite(program_kodu):
                 cell_value = sheet.cell(row_index, all_records[0].keys().index(field) + 1).value
                 update_data.append(cell_value)
         
-        # Satırı güncelle (23 sütun için A-W aralığı)
-        sheet.update(f'A{row_index}:W{row_index}', [update_data])
+        # Satırı güncelle (21 sütun için A-U aralığı)
+        sheet.update(f'A{row_index}:U{row_index}', [update_data])
         
         return jsonify({'message': 'Üniversite başarıyla güncellendi', 'data': data}), 200
         

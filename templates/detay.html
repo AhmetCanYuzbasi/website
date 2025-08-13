@@ -459,7 +459,7 @@
                     <div id="contentContainer" style="display: none;">
                         <!-- Stats Cards -->
                         <div class="row mb-4">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-users"></i>
@@ -468,7 +468,7 @@
                                     <div class="stats-label">Kontenjan</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-chart-line"></i>
@@ -477,7 +477,7 @@
                                     <div class="stats-label">YKS Puanı</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-trophy"></i>
@@ -489,10 +489,19 @@
                             <div class="col-md-3">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
-                                        <i class="fas fa-calendar-alt"></i>
+                                        <i class="fas fa-chart-bar"></i>
                                     </div>
-                                    <div class="stats-number" id="kurulus">-</div>
-                                    <div class="stats-label">Kuruluş Tarihi</div>
+                                    <div class="stats-number" id="yksAralik">-</div>
+                                    <div class="stats-label">YKS Puanı Aralığı</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stats-card text-center">
+                                    <div class="stats-icon">
+                                        <i class="fas fa-sort-numeric-down"></i>
+                                    </div>
+                                    <div class="stats-number" id="basariAralik">-</div>
+                                    <div class="stats-label">Başarı Sırası Aralığı</div>
                                 </div>
                             </div>
                         </div>
@@ -782,6 +791,10 @@
                 } else {
                     document.getElementById('siralama').textContent = '-';
                 }
+                
+                // Aralık alanları (şimdilik mevcut değil)
+                document.getElementById('yksAralik').textContent = '-';
+                document.getElementById('basariAralik').textContent = '-';
                 
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');
 
