@@ -486,7 +486,7 @@
                                     <div class="stats-label">Başarı Sırası</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-chart-bar"></i>
@@ -495,13 +495,22 @@
                                     <div class="stats-label">YKS Puanı Aralığı</div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="stats-card text-center">
                                     <div class="stats-icon">
                                         <i class="fas fa-sort-numeric-down"></i>
                                     </div>
                                     <div class="stats-number" id="basariAralik">-</div>
                                     <div class="stats-label">Başarı Sırası Aralığı</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stats-card text-center">
+                                    <div class="stats-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="stats-number" id="kurulus">-</div>
+                                    <div class="stats-label">Kuruluş Tarihi</div>
                                 </div>
                             </div>
                         </div>
@@ -796,6 +805,7 @@
                 document.getElementById('yksAralik').textContent = '-';
                 document.getElementById('basariAralik').textContent = '-';
                 
+                // Kuruluş Tarihi stats card'da göster
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');
 
                 // Function to format university name with line breaks at parentheses
