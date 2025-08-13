@@ -801,9 +801,9 @@
                     document.getElementById('siralama').textContent = '-';
                 }
                 
-                // Aralık alanları (şimdilik mevcut değil)
-                document.getElementById('yksAralik').textContent = '-';
-                document.getElementById('basariAralik').textContent = '-';
+                // Aralık alanları
+                document.getElementById('yksAralik').textContent = safeGetValue('2024 YKS Puanı Aralığı');
+                document.getElementById('basariAralik').textContent = safeGetValue('2024 Başarı Sırası Aralığı');
                 
                 // Kuruluş Tarihi stats card'da göster
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');

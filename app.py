@@ -453,7 +453,7 @@ def add_universite():
         
         sheet = client.open_by_key(SHEET_ID).sheet1
         
-        # Yeni satır olarak ekle (mevcut sütunlara göre)
+        # Yeni satır olarak ekle (yeni sütunlarla birlikte)
         row_data = [
             data.get('Üniversite Adı', ''),
             data.get('Program Kodu', ''),
@@ -465,6 +465,8 @@ def add_universite():
             data.get('Kontenjan', ''),
             data.get('2024 Başarı Sırası', ''),
             data.get('2024 YKS En Küçük Puanı', ''),
+            data.get('2024 YKS Puanı Aralığı', ''),
+            data.get('2024 Başarı Sırası Aralığı', ''),
             data.get('Kuruluş Tarihi', ''),
             data.get('Adres', ''),
             data.get('Telefon', ''),
@@ -516,7 +518,7 @@ def update_universite(program_kodu):
         
         # Güncellenecek alanları belirle
         update_data = []
-        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı', 'Tür', 'Wikipedia Sayfası', 'Akreditasyon']:
+        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', '2024 YKS Puanı Aralığı', '2024 Başarı Sırası Aralığı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı', 'Tür', 'Wikipedia Sayfası', 'Akreditasyon']:
             if field in data:
                 update_data.append(data[field])
             else:
@@ -524,8 +526,8 @@ def update_universite(program_kodu):
                 cell_value = sheet.cell(row_index, all_records[0].keys().index(field) + 1).value
                 update_data.append(cell_value)
         
-        # Satırı güncelle (21 sütun için A-U aralığı)
-        sheet.update(f'A{row_index}:U{row_index}', [update_data])
+        # Satırı güncelle (23 sütun için A-W aralığı)
+        sheet.update(f'A{row_index}:W{row_index}', [update_data])
         
         return jsonify({'message': 'Üniversite başarıyla güncellendi', 'data': data}), 200
         
