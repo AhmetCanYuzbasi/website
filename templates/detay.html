@@ -434,9 +434,8 @@
                         <div class="header-content">
                             <!-- Test Aşamasındadır Uyarısı -->
                             <div class="test-warning mb-3">
-                                <div class="alert alert-warning d-flex align-items-center justify-content-center" role="alert">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>⚠️ Test Aşamasındadır</strong> - Bu sayfa geliştirme sürecinde bulunmaktadır.
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <strong>⚠️ Bu Sayfa Test Aşamasındadır</strong>
                                 </div>
                             </div>
                             
@@ -747,6 +746,10 @@
                     if (value === null || value === undefined || value === '') {
                         return defaultValue;
                     }
+                    // NaN kontrolü ekle
+                    if (typeof value === 'number' && isNaN(value)) {
+                        return defaultValue;
+                    }
                     return value;
                 }
 
@@ -776,25 +779,32 @@
                 // Function to format university name with line breaks at parentheses
                 function formatUniversityName(name) {
                     if (!name || name === '-') return '-';
+                    
+                    // Değeri string'e çevir
+                    const nameStr = String(name);
+                    
                     // Find the first opening parenthesis and split there
-                    const parenIndex = name.indexOf('(');
+                    const parenIndex = nameStr.indexOf('(');
                     if (parenIndex !== -1) {
-                        const beforeParen = name.substring(0, parenIndex).trim();
-                        const afterParen = name.substring(parenIndex).trim();
+                        const beforeParen = nameStr.substring(0, parenIndex).trim();
+                        const afterParen = nameStr.substring(parenIndex).trim();
                         return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
                     }
-                    return name;
+                    return nameStr;
                 }
                 
                 // Function to format YKS Puanı (örn: "35288-264391(KKTC)")
                 function formatYksPuan(puan) {
                     if (!puan || puan === '-') return '-';
                     
+                    // Değeri string'e çevir
+                    const puanStr = String(puan);
+                    
                     // Parantez içindeki kısmı bul
-                    const parenIndex = puan.indexOf('(');
+                    const parenIndex = puanStr.indexOf('(');
                     if (parenIndex !== -1) {
-                        const beforeParen = puan.substring(0, parenIndex).trim();
-                        const afterParen = puan.substring(parenIndex).trim();
+                        const beforeParen = puanStr.substring(0, parenIndex).trim();
+                        const afterParen = puanStr.substring(parenIndex).trim();
                         
                         // Tire ile ayrılmış değerleri kontrol et
                         if (beforeParen.includes('-')) {
@@ -808,25 +818,28 @@
                     }
                     
                     // Parantez yoksa tire ile ayrılmış değerleri kontrol et
-                    if (puan.includes('-')) {
-                        const parts = puan.split('-');
+                    if (puanStr.includes('-')) {
+                        const parts = puanStr.split('-');
                         if (parts.length === 2) {
                             return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span>`;
                         }
                     }
                     
-                    return puan;
+                    return puanStr;
                 }
                 
                 // Function to format Başarı Sırası (örn: "35288-264391(KKTC)")
                 function formatBasariSirasi(sira) {
                     if (!sira || sira === '-') return '-';
                     
+                    // Değeri string'e çevir
+                    const siraStr = String(sira);
+                    
                     // Parantez içindeki kısmı bul
-                    const parenIndex = sira.indexOf('(');
+                    const parenIndex = siraStr.indexOf('(');
                     if (parenIndex !== -1) {
-                        const beforeParen = sira.substring(0, parenIndex).trim();
-                        const afterParen = sira.substring(parenIndex).trim();
+                        const beforeParen = siraStr.substring(0, parenIndex).trim();
+                        const afterParen = siraStr.substring(parenIndex).trim();
                         
                         // Tire ile ayrılmış değerleri kontrol et
                         if (beforeParen.includes('-')) {
@@ -840,14 +853,14 @@
                     }
                     
                     // Parantez yoksa tire ile ayrılmış değerleri kontrol et
-                    if (sira.includes('-')) {
-                        const parts = sira.split('-');
+                    if (siraStr.includes('-')) {
+                        const parts = siraStr.split('-');
                         if (parts.length === 2) {
                             return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span>`;
                         }
                     }
                     
-                    return sira;
+                    return siraStr;
                 }
 
                 // Basic information
