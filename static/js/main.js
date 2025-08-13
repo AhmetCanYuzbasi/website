@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // URL'yi güncelle
             updateURL();
-            
+
             performSearch();
         });
     });
@@ -451,6 +451,15 @@ function displayUniversities(universities) {
                         <strong>Başarı Sırası:</strong> ${uni['2024 Başarı Sırası']}
                     </div>
                 </div>
+                ${uni['Wikipedia Alan Adı'] ? `
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <a href="${uni['Wikipedia Alan Adı']}" target="_blank" class="wikipedia-link-card" onclick="event.stopPropagation();">
+                            <i class="fab fa-wikipedia-w me-2"></i>Wikipedia'da Görüntüle
+                        </a>
+                    </div>
+                </div>
+                ` : ''}
             </div>
         </div>
     `).join('');

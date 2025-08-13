@@ -457,7 +457,11 @@ def add_universite():
             data.get('Rektör', ''),
             data.get('Üni Alan Adı', ''),
             data.get('Fakülte Alan adı', ''),
-            data.get('Bölüm Alan Adı', '')
+            data.get('Bölüm Alan Adı', ''),
+            data.get('Tür', ''),
+            data.get('Wikipedia Alan Adı', ''),
+            data.get('Wikipedia Sayfası', ''),
+            data.get('Akreditasyon', '')
         ]
         
         sheet.append_row(row_data)
@@ -498,7 +502,7 @@ def update_universite(program_kodu):
         
         # Güncellenecek alanları belirle
         update_data = []
-        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı']:
+        for field in ['Üniversite Adı', 'Program Kodu', 'Fakülte Adı', 'Ülke', 'Şehir', 'Grup', 'Program Adı', 'Kontenjan', '2024 Başarı Sırası', '2024 YKS En Küçük Puanı', 'Kuruluş Tarihi', 'Adres', 'Telefon', 'E-posta', 'Rektör', 'Üni Alan Adı', 'Fakülte Alan adı', 'Bölüm Alan Adı', 'Tür', 'Wikipedia Alan Adı', 'Wikipedia Sayfası', 'Akreditasyon']:
             if field in data:
                 update_data.append(data[field])
             else:
@@ -506,8 +510,8 @@ def update_universite(program_kodu):
                 cell_value = sheet.cell(row_index, all_records[0].keys().index(field) + 1).value
                 update_data.append(cell_value)
         
-        # Satırı güncelle (19 sütun için A-S aralığı)
-        sheet.update(f'A{row_index}:S{row_index}', [update_data])
+        # Satırı güncelle (23 sütun için A-W aralığı)
+        sheet.update(f'A{row_index}:W{row_index}', [update_data])
         
         return jsonify({'message': 'Üniversite başarıyla güncellendi', 'data': data}), 200
         

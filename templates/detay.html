@@ -92,6 +92,27 @@
             position: relative;
             overflow: hidden;
         }
+        
+        .test-warning {
+            margin-bottom: 20px;
+        }
+        
+        .test-warning .alert {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+        }
+        
+        .test-warning .alert:hover {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.5);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
 
         .header-section::before {
             content: '';
@@ -258,6 +279,42 @@
             font-size: 1.1em;
         }
 
+        .info-value a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .info-value a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .wikipedia-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .wikipedia-link:hover {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .wikipedia-link i {
+            font-size: 1rem;
+            margin-right: 6px;
+        }
+
         .contact-link {
             color: var(--primary-color);
             text-decoration: none;
@@ -375,6 +432,14 @@
                     <!-- Header -->
                     <div class="header-section">
                         <div class="header-content">
+                            <!-- Test Aşamasındadır Uyarısı -->
+                            <div class="test-warning mb-3">
+                                <div class="alert alert-warning d-flex align-items-center justify-content-center" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>⚠️ Test Aşamasındadır</strong> - Bu sayfa geliştirme sürecinde bulunmaktadır.
+                                </div>
+                            </div>
+                            
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <a href="#" id="backBtn" class="btn back-btn">
                                     <i class="fas fa-arrow-left me-2"></i>Ana Sayfaya Dön
@@ -384,10 +449,10 @@
                                     <span id="headerUniversiteAdi">Üniversite Adı</span> Detayları
                                 </h1>
                             </div>
-                                                         <div id="loadingIndicator" class="text-center">
-                                 <i class="fas fa-spinner fa-spin fa-2x text-light mb-2"></i>
-                                 <p class="text-light fw-bold">Üniversite bilgileri yükleniyor...</p>
-                             </div>
+                            <div id="loadingIndicator" class="text-center">
+                                <i class="fas fa-spinner fa-spin fa-2x text-light mb-2"></i>
+                                <p class="text-light fw-bold">Üniversite bilgileri yükleniyor...</p>
+                            </div>
                         </div>
                     </div>
 
@@ -448,12 +513,7 @@
                                                  <div class="info-value" id="universiteAdi">-</div>
                                              </div>
                                          </div>
-                                         <div class="col-md-6">
-                                             <div class="info-item">
-                                                 <div class="info-label">Program Kodu</div>
-                                                 <div class="info-value" id="programKodu">-</div>
-                                             </div>
-                                         </div>
+
                                          <div class="col-md-6">
                                              <div class="info-item">
                                                  <div class="info-label">Fakülte Adı</div>
@@ -494,6 +554,24 @@
                                              <div class="info-item">
                                                  <div class="info-label">Tür</div>
                                                  <div class="info-value" id="tur">-</div>
+                                             </div>
+                                         </div>
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">Wikipedia</div>
+                                                 <div class="info-value" id="wikipedia">-</div>
+                                             </div>
+                                         </div>
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">Wikipedia Sayfası</div>
+                                                 <div class="info-value" id="wikipediaSayfasi">-</div>
+                                             </div>
+                                         </div>
+                                         <div class="col-md-6">
+                                             <div class="info-item">
+                                                 <div class="info-label">Akreditasyon</div>
+                                                 <div class="info-value" id="akreditasyon">-</div>
                                              </div>
                                          </div>
                                      </div>
@@ -674,8 +752,25 @@
 
                 // Stats cards
                 document.getElementById('kontenjan').textContent = safeGetValue('Kontenjan');
-                document.getElementById('puan').textContent = safeGetValue('2024 YKS En Küçük Puanı');
-                document.getElementById('siralama').textContent = safeGetValue('2024 Başarı Sırası');
+                
+                // YKS Puanı formatını düzenle (örn: "35288-264391(KKTC)")
+                const yksPuan = safeGetValue('2024 YKS En Küçük Puanı');
+                if (yksPuan && yksPuan !== '-') {
+                    const formattedPuan = formatYksPuan(yksPuan);
+                    document.getElementById('puan').innerHTML = formattedPuan;
+                } else {
+                    document.getElementById('puan').textContent = '-';
+                }
+                
+                // Başarı Sırası formatını düzenle (örn: "35288-264391(KKTC)")
+                const basariSirasi = safeGetValue('2024 Başarı Sırası');
+                if (basariSirasi && basariSirasi !== '-') {
+                    const formattedSira = formatBasariSirasi(basariSirasi);
+                    document.getElementById('siralama').innerHTML = formattedSira;
+                } else {
+                    document.getElementById('siralama').textContent = '-';
+                }
+                
                 document.getElementById('kurulus').textContent = safeGetValue('Kuruluş Tarihi');
 
                 // Function to format university name with line breaks at parentheses
@@ -689,6 +784,70 @@
                         return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
                     }
                     return name;
+                }
+                
+                // Function to format YKS Puanı (örn: "35288-264391(KKTC)")
+                function formatYksPuan(puan) {
+                    if (!puan || puan === '-') return '-';
+                    
+                    // Parantez içindeki kısmı bul
+                    const parenIndex = puan.indexOf('(');
+                    if (parenIndex !== -1) {
+                        const beforeParen = puan.substring(0, parenIndex).trim();
+                        const afterParen = puan.substring(parenIndex).trim();
+                        
+                        // Tire ile ayrılmış değerleri kontrol et
+                        if (beforeParen.includes('-')) {
+                            const parts = beforeParen.split('-');
+                            if (parts.length === 2) {
+                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #b0bec5;">${afterParen}</span>`;
+                            }
+                        }
+                        
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                    }
+                    
+                    // Parantez yoksa tire ile ayrılmış değerleri kontrol et
+                    if (puan.includes('-')) {
+                        const parts = puan.split('-');
+                        if (parts.length === 2) {
+                            return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span>`;
+                        }
+                    }
+                    
+                    return puan;
+                }
+                
+                // Function to format Başarı Sırası (örn: "35288-264391(KKTC)")
+                function formatBasariSirasi(sira) {
+                    if (!sira || sira === '-') return '-';
+                    
+                    // Parantez içindeki kısmı bul
+                    const parenIndex = sira.indexOf('(');
+                    if (parenIndex !== -1) {
+                        const beforeParen = sira.substring(0, parenIndex).trim();
+                        const afterParen = sira.substring(parenIndex).trim();
+                        
+                        // Tire ile ayrılmış değerleri kontrol et
+                        if (beforeParen.includes('-')) {
+                            const parts = beforeParen.split('-');
+                            if (parts.length === 2) {
+                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #b0bec5;">${afterParen}</span>`;
+                            }
+                        }
+                        
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                    }
+                    
+                    // Parantez yoksa tire ile ayrılmış değerleri kontrol et
+                    if (sira.includes('-')) {
+                        const parts = sira.split('-');
+                        if (parts.length === 2) {
+                            return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span>`;
+                        }
+                    }
+                    
+                    return sira;
                 }
 
                 // Basic information
@@ -706,7 +865,6 @@
                     contentUniversiteAdi.innerHTML = formatUniversityName(universiteAdi);
                 }
                 
-                document.getElementById('programKodu').textContent = safeGetValue('Program Kodu');
                 document.getElementById('fakulteAdi').textContent = safeGetValue('Fakülte Adı');
                 document.getElementById('programAdi').textContent = safeGetValue('Program Adı');
                 document.getElementById('ulke').textContent = safeGetValue('Ülke');
@@ -714,6 +872,23 @@
                 document.getElementById('grup').textContent = safeGetValue('Grup');
                 document.getElementById('kurulusTarihi').textContent = safeGetValue('Kuruluş Tarihi');
                 document.getElementById('tur').textContent = safeGetValue('Tür');
+                
+                // Wikipedia Sayfası ve Akreditasyon
+                document.getElementById('wikipediaSayfasi').textContent = safeGetValue('Wikipedia Sayfası');
+                document.getElementById('akreditasyon').textContent = safeGetValue('Akreditasyon');
+                
+                // Wikipedia link
+                const wikipediaElement = document.getElementById('wikipedia');
+                const wikipediaValue = safeGetValue('Wikipedia Alan Adı');
+                if (wikipediaValue && wikipediaValue !== '-') {
+                    // Wikipedia linki varsa, tıklanabilir link olarak göster
+                    wikipediaElement.innerHTML = `<a href="${wikipediaValue}" target="_blank" class="wikipedia-link">
+                        <i class="fab fa-wikipedia-w me-2"></i>Wikipedia'da Görüntüle
+                    </a>`;
+                } else {
+                    // Wikipedia linki yoksa, "-" göster
+                    wikipediaElement.textContent = '-';
+                }
 
                 // Contact information
                 document.getElementById('adres').textContent = safeGetValue('Adres');
