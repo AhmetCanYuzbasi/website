@@ -658,6 +658,17 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="info-item">
+                                                <div class="info-label">Wikipedia Sayfası</div>
+                                                <div class="info-value">
+                                                    <a href="#" id="wikipediaSayfasiLink" class="contact-link wikipedia-link" target="_blank">
+                                                        <i class="fab fa-wikipedia-w me-1"></i>
+                                                        Wikipedia Sayfası
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -743,7 +754,8 @@
                 // Güvenli değer alma fonksiyonu
                 function safeGetValue(key, defaultValue = '-') {
                     const value = data[key];
-                    if (value === null || value === undefined || value === '') {
+                    console.log(`safeGetValue for ${key}:`, value, 'type:', typeof value);
+                    if (value === null || value === undefined) {
                         return defaultValue;
                     }
                     // NaN kontrolü ekle
@@ -758,8 +770,10 @@
                 
                 // YKS Puanı formatını düzenle (örn: "35288-264391(KKTC)")
                 const yksPuan = safeGetValue('2024 YKS En Küçük Puanı');
+                console.log('YKS Puanı raw value:', yksPuan, 'type:', typeof yksPuan);
                 if (yksPuan && yksPuan !== '-') {
                     const formattedPuan = formatYksPuan(yksPuan);
+                    console.log('Formatted YKS Puanı:', formattedPuan);
                     document.getElementById('puan').innerHTML = formattedPuan;
                 } else {
                     document.getElementById('puan').textContent = '-';
@@ -767,8 +781,10 @@
                 
                 // Başarı Sırası formatını düzenle (örn: "35288-264391(KKTC)")
                 const basariSirasi = safeGetValue('2024 Başarı Sırası');
+                console.log('Başarı Sırası raw value:', basariSirasi, 'type:', typeof basariSirasi);
                 if (basariSirasi && basariSirasi !== '-') {
                     const formattedSira = formatBasariSirasi(basariSirasi);
+                    console.log('Formatted Başarı Sırası:', formattedSira);
                     document.getElementById('siralama').innerHTML = formattedSira;
                 } else {
                     document.getElementById('siralama').textContent = '-';
@@ -933,6 +949,16 @@
                     bolumLink.style.display = 'inline-block';
                 } else {
                     bolumLink.style.display = 'none';
+                }
+
+                // Wikipedia link
+                const wikipediaSayfasiLink = document.getElementById('wikipediaSayfasiLink');
+
+                if (safeGetValue('Wikipedia Sayfası', '') !== '-') {
+                    wikipediaSayfasiLink.href = safeGetValue('Wikipedia Sayfası');
+                    wikipediaSayfasiLink.style.display = 'inline-block';
+                } else {
+                    wikipediaSayfasiLink.style.display = 'none';
                 }
                 
             } catch (error) {
