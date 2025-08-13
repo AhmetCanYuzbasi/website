@@ -555,18 +555,7 @@
                                                  <div class="info-value" id="tur">-</div>
                                              </div>
                                          </div>
-                                         <div class="col-md-6">
-                                             <div class="info-item">
-                                                 <div class="info-label">Wikipedia</div>
-                                                 <div class="info-value" id="wikipedia">-</div>
-                                             </div>
-                                         </div>
-                                         <div class="col-md-6">
-                                             <div class="info-item">
-                                                 <div class="info-label">Wikipedia Sayfası</div>
-                                                 <div class="info-value" id="wikipediaSayfasi">-</div>
-                                             </div>
-                                         </div>
+
                                          <div class="col-md-6">
                                              <div class="info-item">
                                                  <div class="info-label">Akreditasyon</div>
@@ -707,7 +696,11 @@
         // Get program code from URL
         function getProgramCode() {
             const pathParts = window.location.pathname.split('/');
-            return pathParts[pathParts.length - 1];
+            const programCode = pathParts[pathParts.length - 1];
+            console.log('URL path:', window.location.pathname);
+            console.log('Path parts:', pathParts);
+            console.log('Program code:', programCode);
+            return programCode;
         }
 
         // Load university data
@@ -902,22 +895,8 @@
                 document.getElementById('kurulusTarihi').textContent = safeGetValue('Kuruluş Tarihi');
                 document.getElementById('tur').textContent = safeGetValue('Tür');
                 
-                // Wikipedia Sayfası ve Akreditasyon
-                document.getElementById('wikipediaSayfasi').textContent = safeGetValue('Wikipedia Sayfası');
+                // Akreditasyon
                 document.getElementById('akreditasyon').textContent = safeGetValue('Akreditasyon');
-                
-                // Wikipedia link
-                const wikipediaElement = document.getElementById('wikipedia');
-                const wikipediaValue = safeGetValue('Wikipedia Alan Adı');
-                if (wikipediaValue && wikipediaValue !== '-') {
-                    // Wikipedia linki varsa, tıklanabilir link olarak göster
-                    wikipediaElement.innerHTML = `<a href="${wikipediaValue}" target="_blank" class="wikipedia-link">
-                        <i class="fab fa-wikipedia-w me-2"></i>Wikipedia'da Görüntüle
-                    </a>`;
-                } else {
-                    // Wikipedia linki yoksa, "-" göster
-                    wikipediaElement.textContent = '-';
-                }
 
                 // Contact information
                 document.getElementById('adres').textContent = safeGetValue('Adres');
