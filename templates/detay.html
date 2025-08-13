@@ -306,7 +306,7 @@
         }
 
         .stats-label {
-            color: var(--text-secondary);
+            color: var(--text-primary);
             font-size: 0.9em;
         }
 
@@ -384,7 +384,7 @@
         }
 
         .info-value {
-            color: var(--text-secondary);
+            color: var(--text-primary);
             font-size: 1.1em;
         }
 
@@ -440,7 +440,7 @@
         .loading {
             text-align: center;
             padding: 80px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
 
         .loading i {
@@ -923,7 +923,7 @@
                     if (parenIndex !== -1) {
                         const beforeParen = nameStr.substring(0, parenIndex).trim();
                         const afterParen = nameStr.substring(parenIndex).trim();
-                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #ffffff;">' + afterParen + '</span>';
                     }
                     return nameStr;
                 }
@@ -945,11 +945,11 @@
                         if (beforeParen.includes('-')) {
                             const parts = beforeParen.split('-');
                             if (parts.length === 2) {
-                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #b0bec5;">${afterParen}</span>`;
+                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #ffffff;">${afterParen}</span>`;
                             }
                         }
                         
-                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #ffffff;">' + afterParen + '</span>';
                     }
                     
                     // Parantez yoksa tire ile ayrılmış değerleri kontrol et
@@ -980,11 +980,11 @@
                         if (beforeParen.includes('-')) {
                             const parts = beforeParen.split('-');
                             if (parts.length === 2) {
-                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--accent-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #b0bec5;">${afterParen}</span>`;
+                                return `<span style="color: var(--primary-color); font-weight: bold;">${parts[0]}</span> - <span style="color: var(--primary-color); font-weight: bold;">${parts[1]}</span><br/><span style="font-size: 0.85em; color: #ffffff;">${afterParen}</span>`;
                             }
                         }
                         
-                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #b0bec5;">' + afterParen + '</span>';
+                        return beforeParen + '<br/><span style="font-size: 0.85em; color: #ffffff;">' + afterParen + '</span>';
                     }
                     
                     // Parantez yoksa tire ile ayrılmış değerleri kontrol et
